@@ -1,0 +1,13 @@
+// Might be able to extend with cell.js, but maybe too many #{}
+// Add id='name' on creation
+tr.resident-row
+	th(scope="row")
+		div.fa.fa-unlock.locker.right
+		div.picture Pic
+		div.res-name
+			input(type="text", name="res-name", placeholder="Name")
+		div.dh-uh.input
+			input(type="radio", name="dh_uh", data="dh", value="dh", checked="checked")
+			label(for="dh_uh") DH
+			input(type="radio", name="dh_uh", data="uh", value="uh")
+			label(for="dh_uh") UH
