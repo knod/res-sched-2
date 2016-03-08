@@ -322,9 +322,9 @@ var Settings = function() {
 			$tr.append( $td );
 
 			$td.addClass( month );
-			$td.prop('data-month', month);
+			$td.attr('data-month', month);
 			// $td.data('month', month)
-			console.log($td.prop('data-month'))
+			console.log($td.attr('data-month'))
 
 			buildCell( $td, month, resident )
 
