@@ -47,21 +47,30 @@ schedRouter.post( '/save', function onPOSTRequest( request, response, next ) {
 
 
 // PROCESSING AND RETURNING
-schedRouter.put( '/', function onPUTRequest( request, response, next ) {
+schedRouter.put( '/generate', function onPUTRequest( request, response, next ) {
 // If schedRouter gets a PUT (edit) request for '/' (user is editing),
 // generate new data for the schedule and send it back
 	console.log('generating object to be displayed on page');//:', request.body);
-	
-	var myRequirements 	= request.body;
-	// As long as generate runs synchronously
-	var generated 		= generate( myRequirements );
 
-	if (err) { next( err ) }
-	else {
-		response.status( 200 );  // Can use this to show visually that it's been processed
-		response.json( generated );  // Does this send too?
-		// response.send( generated );
-	}
+	var residents = request.body;//JSON.parse(request.body).residents;
+	console.log('in .put(). Sent data:', residents[0]);
+	// As long as generate runs synchronously
+	var generated = generate.generate( residents );
+
+	response.status( 200 );  // Can use this to show visually that it's been processed
+	response.json( generated );
+});  // End on put '/'
+
+
+// STOPPING
+schedRouter.put( '/cancel', function onPUTRequest( request, response, next ) {
+// If schedRouter gets a PUT (edit) request for '/' (user is editing),
+// stop generatind new data, send back the old resident data
+	console.log('canceling');//:', request.body);
+
+	generate.cancel();
+	response.status( 200 );  // Can use this to show visually that it's been processed
+
 });  // End on put '/'
 
 

@@ -217,7 +217,7 @@ var rotations = [
 		resTypes: [ 'dh', 'uh' ],
 		perResident: {'dh': 1, 'uh': 1},
 		easy: true,
-		vacation: true
+		vacation: false
 	},
 	{  // 8
 		name: 'Derm',

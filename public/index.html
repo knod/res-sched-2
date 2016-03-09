@@ -16,22 +16,24 @@
 
 	<h1>Schedule</h1>
 	
+	<button name='generate'>Generate New</button><button name='cancel'>Cancel</button>
+
 	<table class='schedule'>
 		<thead>
 			<tr>
 				<th scope="col" class='month' data-month='none'>2016</th>
-				<th scope="col" class='month' data-month='Jul'>July</th>
-				<th scope="col" class='month' data-month='Aug'>August</th>
-				<th scope="col" class='month' data-month='Sep'>September</th>
-				<th scope="col" class='month' data-month='Oct'>October</th>
-				<th scope="col" class='month' data-month='Nov'>November</th>
-				<th scope="col" class='month' data-month='Dec'>December</th>
 				<th scope="col" class='month' data-month='Jan'>January</th>
 				<th scope="col" class='month' data-month='Feb'>February</th>
 				<th scope="col" class='month' data-month='Mar'>March</th>
 				<th scope="col" class='month' data-month='Apr'>April</th>
 				<th scope="col" class='month' data-month='May'>May</th>
 				<th scope="col" class='month' data-month='Jun'>June</th>
+				<th scope="col" class='month' data-month='Jul'>July</th>
+				<th scope="col" class='month' data-month='Aug'>August</th>
+				<th scope="col" class='month' data-month='Sep'>September</th>
+				<th scope="col" class='month' data-month='Oct'>October</th>
+				<th scope="col" class='month' data-month='Nov'>November</th>
+				<th scope="col" class='month' data-month='Dec'>December</th>
 			</tr>
 		</thead>
 
@@ -42,15 +44,16 @@
 
 	<script src='javascripts/client/schedule.js'></script>
 	<script src='javascripts/client/settings.js'></script>
+	<script src='javascripts/client/page.js'></script>
 	<script>
 		var residents = [
 			// MAX 3 VACATIONS IN `vacationMonths`!!! OTHERS CAN GO IN `extraVacationMonths`
 			// `rejects` is monts and rotations that the resident definitely doesn't want to do
 			// each working schedule should be kept with final results
 			{
-				name: 'Roxi', dh_uh: 'dh', locked: true,
-				vacationMonths: ['Jul'], extraVacationMonths: ['Aug'],
-				requested: [],
+				name: 'Roxi', dh_uh: 'dh', locked: false,
+				vacationMonths: [], extraVacationMonths: [],
+				requested: [{month:'Jul', rotation:'Elec'}],
 				rejected: [/*{month: 'x', roations: ['x', 'x']}*/],  // maybe this should have been { 'Jun': [] }
 				possible: [],//, schedule: []
 				lockedMonths: [],
@@ -60,9 +63,9 @@
 				name: 'Sarah', dh_uh: 'dh', locked: false,
 				vacationMonths: [], extraVacationMonths: [],
 				requested: [{month:'Aug', rotation:'Rural'}],
-				rejected: [{month:'Aug', rotations: ['FMS','Elec']}],
+				rejected: [],
 				possible: [],//, schedule: []
-				lockedMonths: ['Jul'],
+				lockedMonths: [],
 				selected: []  // there will be repeats from requested
 			},
 			{
@@ -139,9 +142,12 @@
 			}
 		];
 
-		var settings = Settings();
-		var tbody 	 = $('.jade-views')[0];
-		settings.load( tbody, residents );
+		// var settings = Settings();
+		var page 		= Page();
+		var tbody 	 	= $('.jade-views')[0];
+		page.load( tbody, residents );
+
+		var schedHandler = ScheduleHandler();
 		// Need to:
 		// - Events -
 		// detect events
@@ -153,10 +159,6 @@
 		// display data
 		// save data
 		// convert data to csv and make available
-
-		$('input').on('change', function(evnt) {
-			console.log( 'changed' );
-		});
 
 	</script>
 </body>

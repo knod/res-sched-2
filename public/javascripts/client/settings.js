@@ -17,6 +17,8 @@
 * - When the user hand-selects a rotation, automatically lock
 * 	that month. If then unlocked, keep the selection the same.
 * 
+* NOTES:
+* - Push just front end: https://gist.github.com/cobyism/4730490
 */
 
 'use strict'
@@ -28,16 +30,16 @@ var Settings = function() {
 
 	settings.history = [];
 
-	// Example resident object
-	var resEx = {
-		name: 'Judy', 'dh_uh': 'dh', locked: false,
-		vacationMonths: ['x'], extraVacationMonths: ['y'],
-		requested: [{month: 'x', roation: 'a'}],
-		rejected: [{month: 'x', roations: ['b', 'c']}],
-		possible: [[4*12]],
-		lockedMonths: ['q', 'r'],
-		selected: [{month: 's', rotation: 'd'}]
-	}
+	// // Example resident object
+	// var resEx = {
+	// 	name: 'Judy', 'dh_uh': 'dh', locked: false,
+	// 	vacationMonths: ['x'], extraVacationMonths: ['y'],
+	// 	requested: [{month: 'x', roation: 'a'}],
+	// 	rejected: [{month: 'x', roations: ['b', 'c']}],
+	// 	possible: [[4*12]],
+	// 	lockedMonths: ['q', 'r'],
+	// 	selected: [{month: 's', rotation: 'd'}]
+	// }
 
 
 	// ===================================================
@@ -88,7 +90,7 @@ var Settings = function() {
 		}
 
 		// - Selected/Generated -
-		var $generated = $cell.find('input[name=rot_request:checked').eq(0);
+		var $generated = $cell.find('input[name=rot_request]:checked').eq(0);
 		res.selected.push( {month: month, rotation: $generated.val()} )
 
 		// - Rejections/Exclusions -
@@ -99,7 +101,7 @@ var Settings = function() {
 			rejects.push($(this).val());
 		});
 
-		res.rejected.push({ month: month, rejected: rejects });
+		res.rejected.push({ month: month, rotations: rejects });
 
 		return res;
 	};  // End saveByCell()
@@ -116,15 +118,16 @@ var Settings = function() {
 			vacationMonths: [], extraVacationMonths: [],
 			requested: [], rejected: [], lockedMonths: [],
 			possible: [],  // Needs to be empty when sent to generator
+			selected: []
 		};
 
 		var $header = $($row.find('th')[0]);
-		res.name 	= $($header.find('.res-name')).val();
+		res.name 	= $($header.find('input[name=res_name]')).val();
 		res.locked 	= $($header.find('.locker')).hasClass('fa-lock');
 		res.dh_uh 	= $($header.find('input[name=dh_uh]')).val();
 		
 		// The td's in the tr
-		var $cells 	 = $(th).find('td');
+		var $cells 	 = $row.find('td');
 
 		for ( var celli = 0; celli < $cells.length; celli++ ) {
 			var $cell = $($cells[ celli ]);
@@ -141,7 +144,7 @@ var Settings = function() {
 
 		// Asynchronous $.ajax
 		$.ajax({
-			url: '/settings',  // Stuff in start of app.js (app.use('/keys', require('./routes/keys') );)
+			url: '/settings',  // Stuff in start of app.js (app.use('/settings', require('./routes/settings') );)
 			method: 'POST',
 			data: residents
 		})  // End $.ajax() (sort of)
@@ -169,13 +172,17 @@ var Settings = function() {
 			console.log('saved, front end:', dbResidentData);
 			// ??: Just the id somehow?
 			settings.history.push( dbResidentData )
+
+			// Index of latest history is now at the last history item
+			settings.historyLevel = settings.history.length - 1;
 		}
+
 
 		return dbResidentData;
 	};  // End settings.addHistory()
 
 
-	settings.update = function( tbody ) {
+	settings.update = function( tbody, skipSave ) {
 	// updates resident data
 
 		var residents = [];
@@ -189,13 +196,19 @@ var Settings = function() {
 			residents.push( res );
 		}  // end for every table row
 
-		save( residents, settings.addHistory );  // end saving
-		// Index of latest history is now at the last history item
-		settings.historyLevel = settings.history.length - 1;
+		// console.log('update() residents:', residents)
 
+		if ( !skipSave ) {
+			save( residents, settings.addHistory );  // end saving
+		}
+
+		settings.residents = residents;
+
+		// Not to do with asynchronous saving, can return residents
 		return residents;
 	};  // End settings.update()
 
+	settings.residents = [];
 
 	// ===================================================
 	// LOADING/DISPLAYING
@@ -207,7 +220,6 @@ var Settings = function() {
 
 		if (resident.locked) {
 			$tr.find('input').prop('disabled', true)
-			// $('#' + id + ' input').prop('disabled', true);
 			$tr.find('.locker').removeClass('fa-unlock').addClass('fa-lock');
 			$tr.addClass('locked');
 		}
@@ -220,61 +232,43 @@ var Settings = function() {
 	var monthMap = {'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
 					'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11};
 	var months 	 = [ 'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec' ];
+	var rotationNames = [ 'None', 'FMS', 'Rural', 'Elec', 'Cardio', 'W-P', 'Ger', 'pcmh', 'Derm' ];
 
 	var buildCell = function( $cell, month, resident ) {
 	// For each property of the resident, check if this month is in there
 	// If so, do stuff
 
+		var monthi = monthMap[ month ];
+
 		// - VACATIONS -
 		var allVacs = resident.vacationMonths.concat( resident.extraVacationMonths );
-		// console.log( 'all vacation months:', allVacs );
+
 		// If this month is listed in the vacation months, check its vacation checkbox
 		if ( allVacs.indexOf(month) > -1 ) {
 			$($cell.find('input[name=vacation]')[0]).prop('checked', true);
 		}
 
 		// - REQUESTED -
-		console.log($cell.attr('data-month'))
 		// Give this set of radio groups a unique name
 		var sanitzd = resident.name.replace(/\W+/g, "_"),
-			name 	= sanitzd + '_' + $cell.attr('data-month') + '_rot_request';
-		$cell.find('input[name=rot_request]').attr('name', name);
-
-		// var requested = resident.requested;
-		// for ( var reqi = 0; reqi < requested.length; reqi++ ) {
-		// 	var request = requested[ reqi ];
-
-		// 	// If it's a month that's requested
-		// 	if ( month === request.month ) {
-		// 		// select the correct rotation
-		// 		var $choice = $($cell.find('.request-choice.' + request.rotation )[0]);
-		// 		$($choice.find( 'input' )[0]).prop('checked', true);
-		// 	}
-		// }  // end for requested
-
+			name 	= sanitzd + '_' + month + '_rot_request';
+		$cell.find('input[name=rot_request]').prop('name', name);
 
 		// - GENTERATED -
-		var generated 	= resident.selected.concat(resident.requested),
-			choice 		= 'None';
-		for ( var geni = 0; geni < generated.length; geni++ ) {
-
-			var gened = generated[ geni ];
-
-			// If it's a month that's generated
-			// select the correct rotation
-			if ( month === gened.month ) {
-				choice = gened.rotation;
-				// if nothing's been generated for this month, choice will be 'None'
+		var selected = resident.selected,
+			choice 	 = 'None';
+		for ( var seli = 0; seli < selected.length; seli++ ) {
+			if ( seli === monthi ) {
+				var selection = selected[ seli ];
+				// console.log(selected, selection, rotationNames, rotationNames[selection])
+				choice = rotationNames[selection];
 			}
+		}  // End for each pre-selected, but not locked
 
-		}  // End for each pre-generated, but not locked
-
+		// Update radio button selection and cell text
 		var $choice = $cell.find('.request-choice.' + choice ).eq(0);
-		// console.log($choice.find( 'input' )[0])
 		$choice.find( 'input' ).eq(0).prop('checked', true);
-		// and update the name to the right name
 		var $name = $cell.find('.rot-output').eq(0);
-		// console.log($name)
 		$name.text( choice );
 
 
@@ -305,6 +299,29 @@ var Settings = function() {
 			$cell.addClass('locked');
 		}
 
+		// Lock a month if it's requested
+		var requested = resident.requested;
+		for ( var reqi = 0; reqi < requested.length; reqi++ ) {
+			var request = requested[ reqi ]
+
+			if ( request.month === month ) {
+
+				var rot = request.rotation;
+				// Update radio button selection and cell text
+				var $choice = $cell.find('.request-choice.' + rot ).eq(0);
+				$choice.find( 'input' ).eq(0).prop('checked', true);
+				var $name = $cell.find('.rot-output').eq(0);
+				$name.text( rot );
+
+				$cell.find('input').prop('disabled', true);
+
+				var $locker = $($cell.find('.locker')[0]);
+				$locker.removeClass('fa-unlock');
+				$locker.addClass('fa-lock');
+				$cell.addClass('locked');
+			}
+		}
+
 		return $cell;
 	};  // End buildCell()
 
@@ -313,21 +330,18 @@ var Settings = function() {
 	// Iterates through 12 months, building a cell for each month
 
 		for ( var monthi = 0; monthi < months.length; monthi++ ) {
-			var monthNum = (monthi + 6)  % 12,
-				month 	 = months[ monthNum ];
-			// TODO: Test with resident with known rotation preferences
-			// console.log('Am I doing months reordering right?', month );
+			// var monthNum = (monthi + 6)  % 12,
+			// 	month 	 = months[ monthNum ];
+			var month = months[ monthi ];
 
 			var $td = $(td);
 			$tr.append( $td );
 
 			$td.addClass( month );
 			$td.attr('data-month', month);
-			// $td.data('month', month)
-			console.log($td.attr('data-month'))
+			// console.log($td.prop('data-month'))  // still not working
 
 			buildCell( $td, month, resident )
-
 		}
 
 		return $tr;
@@ -362,6 +376,7 @@ var Settings = function() {
 		return $tr;
 	};
 
+	var haveDoneThis = false;
 
 	var buildRows = function( err, tr, td, tbody, residents ) {
 	/* (str?, str, str, {}) -> None
@@ -381,6 +396,8 @@ var Settings = function() {
 				var resident = residents[ resi ];
 				var $trNode = $(tr);
 
+				if ( resident.name === 'Roxi' ) {console.log(resident.name, ':', resident.vacationMonths)}
+
 				$tbody.append( $trNode );
 
 				// Not sure what my stuff looks like now, so I'm just going to
@@ -394,15 +411,72 @@ var Settings = function() {
 				lockIf( $trNode, resident );
 
 			}  // end for every table row
+
+			$('input').change(function(evnt) {
+				// settings.update( $tbody[0] );
+				page.update( $tbody[0] );
+			});
+
+			var generate = function() {
+				schedHandler.generate( settings.residents );
+			}
+
+			console.trace( '****** Roxi vacations:', residents[0].vacationMonths)
+
+			if (!haveDoneThis) {
+				haveDoneThis = true;
+				$('button[name=generate]').click( generate );
+				$('button[name=cancel]').click(function cancel() {
+					schedHandler.cancel();
+				});
+			}
+
 		}  // end if/if not err
 
 		// Don't pretend to return something for asynchronous call
 	};  // End buildRows() (callback)
 
 
-	var getCell = function( err, tr, tbody, residents ) {
+	settings.getSettings = function( err, td, tr, tbody, residents ) {
 
 		var callback = buildRows;
+
+		if ( err ) {
+			console.error('get td errored:', err );
+			callback( null, tr, td, tbody, residents )
+		} else {
+			console.log('got td');
+
+			$.ajax({
+				url: '/settings',
+				method: 'GET'//,
+				// data: residents // ??: Is this how to send residents with a GET request?
+			})  // End $.ajax() (sort of)
+			// If no .then(), no way to get residents back
+			.then( function successHandler( ress ) {
+				// Will not mutate the back end td object
+				console.log( 'Did settings contain an array? ', ress.isArray() )
+				if ( ress.isArray() ) {
+					callback( null, tr, td, tbody, ress );
+				} else {
+					// Do it anyway, but with our stock data
+					callback( null, tr, td, tbody, residents );
+				}
+				
+			}, function errHandler( err ) {
+				// !!: Takes over 4 min. to error
+				console.error('error getting settings', err);
+				callback( null, tr, td, tbody, residents );
+			});  // End $.ajax
+		}
+
+	};  // settings.getSettings() (callback)
+
+
+	settings.getCell = function( err, tr, tbody, residents, skipSettings ) {
+
+		var callback1 = settings.getSettings,
+			callback2 = buildRows;
 
 		if ( err ) {
 			console.error('get tr template errored:', err );
@@ -416,22 +490,26 @@ var Settings = function() {
 			})  // End $.ajax() (sort of)
 			// If no .then(), no way to get residents back
 			.then( function successHandler( td ) {
+				console.log('got tr')
 				
 				// Will not mutate the back end td object
-				callback( null, tr, td, tbody, residents );
+				if ( skipSettings ) {
+					callback2(  null, tr, td, tbody, residents  )
+				} else {
+					callback1( null, td, tr, tbody, residents );
+				}
 
 			}, function errHandler( err ) {
 				console.error(err);
-				callback( err, null, null, tbody, residents );
+				callback1( err, td, tr, tbody, residents );
 			});  // End $.ajax
 		}
+	};  // End settings.getCell() (callback)
 
-	};  // End getCell() (callback)
 
+	settings.getRow = function( tbody, residents, skipSettings ) {
 
-	var getRow = function( tbody, residents ) {
-
-		var callback = getCell;
+		var callback = settings.getCell;
 
 		$.ajax({
 			url: '/row',
@@ -442,22 +520,32 @@ var Settings = function() {
 		.then( function successHandler( tr ) {
 			
 			// Will not mutate the back end tr object
-			callback( null, tr, tbody, residents );
+			callback( null, tr, tbody, residents, skipSettings );
 
 		}, function errHandler( err ) {
 			console.error(err);
-			callback( err, null, null );
+			callback( err, null, tbody, residents, skipSettings );
 		});  // End $.ajax
 
-	};  // End getRow()
+	};  // End settings.getRow()
 
 
-	settings.load = function( tbody, residents ) {
+	settings.load = function( tbody, residents, skipSettings ) {
 
-		getRow( tbody, residents );
+		$(tbody).html('');
+		settings.residents = residents;
+		settings.getRow( tbody, residents, skipSettings );
 
-		// Don't pretend to return something when this is asynchronous
+		// Will return before synchronous stuff is done I guess
+		return residents;
 	};  // End settings.load()
+
+
+	// settings.build = function( tbody, residents ) {
+
+	// 	settings.getRow()
+
+	// }
 
 
 	return settings;

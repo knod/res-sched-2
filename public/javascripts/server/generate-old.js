@@ -30,8 +30,8 @@ var combosFile 	= fs.readFileSync(__dirname + '/../data/combos.json');
 var combosArr 	= JSON.parse(combosFile);
 
 // Path to where combo data by vacation month is kept, in format for fs.readFile()
-var monthsDir 	= '../../../../../../Comfadorable/Dropbox/ResSchedule';
-// console.log('--------- directory:', fs.readdirSync('../../../../../../Comfadorable/Dropbox')); //+ '/../res-sched-app/'));// + '/../javascripts'));
+var monthsDir 	= '../../../../../../../Comfadorable/Dropbox/ResSchedule';
+// console.log('--------- directory:', fs.readdirSync('../../../../../../../Comfadorable/Dropbox/')); //+ '/../res-sched-app/'));// + '/../javascripts'));
 
 // var residents 	= [constraints.residents[0], constraints.residents[1]],
 var residents 	= constraints.residents,
@@ -235,7 +235,7 @@ var tryOne = function( residents ) {
 		// var oldTime2 = Date.now();
 	var thisTracker = JSON.parse(JSON.stringify( tracker ));  // global object `tracker`
 		// var newTime2 = Date.now();
-		// console.log('residents tracker object:', elapsed(oldTime2, newTime2))
+		// console.log('copy tracker object:', elapsed(oldTime2, newTime2))
 
 	var reached = 0;
 		// var oldTime3 = Date.now();
@@ -244,7 +244,6 @@ var tryOne = function( residents ) {
 
 		var resident = residents[ resi ];
 		var possible = resident.possible;
-		var selected = [];
 
 		var searching 	= true,
 			schedIndx 	= 0,
@@ -254,16 +253,11 @@ var tryOne = function( residents ) {
 		// Get random schedule
 			// var oldTime4 = Date.now();
 		while ( searching ) {
-			if (stop) {
-				return null;
-			}
 
-			// !!: TRYING: same for everyone, even last resident
-
-			// if ( !(resi === (residents.length - 1)) ) {
+			if ( !(resi === (residents.length - 1)) ) {
 				// Only try a certain number of times before starting
 				// all over again with the first resident
-				if (attemptNum > 10000) {
+				if (attemptNum > 100000) {
 					// console.log('OVER 9000; reached resident', reached);
 					// console.log('tryOne() Time elapsed:', elapsed( oldTime1 ) );
 					return null;
@@ -273,17 +267,17 @@ var tryOne = function( residents ) {
 				attemptNum += 1
 				// Get a random index for the resident's schedule
 				schedIndx = Math.floor(Math.random() * possible.length)
-			// // for the last resident, go through all of them
-			// } else {
-			// 	// -1 because schedIndx gets increased after this check
-			// 	if ( !(schedIndx < (possible.length - 1)) ) {
-			// 		console.log('NONE FOUND FOR #10', elapsed(oldTime) );
-			// 		// console.log( thisTracker )
-			// 		// console.log('tryOne() Time elapsed:', elapsed( oldTime1 ) );
-			// 		return null;
-			// 	}
-			// 	schedIndx += 1;
-			// }
+			// for the last resident, go through all of them
+			} else {
+				// -1 because schedIndx gets increased after this check
+				if ( !(schedIndx < (possible.length - 1)) ) {
+					console.log('NONE FOUND FOR #10', elapsed(oldTime) );
+					// console.log( thisTracker )
+					// console.log('tryOne() Time elapsed:', elapsed( oldTime1 ) );
+					return null;
+				}
+				schedIndx += 1;
+			}
 			
 			var sched 		= possible[ schedIndx ];
 			var meetsReqs 	= !tooMany( resident, sched, thisTracker );
@@ -293,11 +287,15 @@ var tryOne = function( residents ) {
 				// Increment the tracker so we can match against the next one
 					// var oldTime6 = Date.now();
 				trackItUp( resident, sched, thisTracker );
+					// var newTime6 = Date.now();
+					// console.log('trackItUp():', elapsed(oldTime6, newTime6));
 
-				// !!! NEW !!! for just changing residents/residents
-				// selected.push( sched );
-				resident.selected = sched;
-				// console.log(resident.name);
+				// Rank each result so we can add them at the end?
+				result.scheds.push( {
+					resident: resident,
+					schedule: sched,
+					rank: schedIndx
+				} )  // add it and go to the next resident
 
 				// Move on to the next resident
 				searching = false;
@@ -310,17 +308,14 @@ var tryOne = function( residents ) {
 			// var newTime4 = Date.now();
 			// console.log('while searching:', elapsed(oldTime4, newTime4));
 
-		// resident.selected = selected;
-
 	}  // end for every resident
 		// var newTime3 = Date.now();
 		// console.log('loop through every resident:', elapsed(oldTime3, newTime3));
 
 	// Rank based on rank of each schedule (though this doesn't
 	// work right now because stuff isn't in order of rank)
-		// var oldTime7 = Date.now();
-	// result.rank = rankResult( result );
-// console.log(residents[0].name)
+		var oldTime7 = Date.now();
+	result.rank = rankResult( result );
 		// var newTime7 = Date.now();
 		// console.log('result.rank:', elapsed(oldTime7, newTime7));
 
@@ -334,25 +329,21 @@ var tryOne = function( residents ) {
 
 	// console.log('tryOne() Time elapsed:', elapsed( oldTime1 ) );
 
-	// return result;
-	return residents;
+	return result;
 };
 
 
 var oneResult = function( residents ) {
 // If haven't met min requirements, try again
 
-	var result 	= null;
+	var oldTime = Date.now();
+	var result = null;
 
 	while ( result === null ) {
-		console.log( 'in oneResult() while loop. stop:', stop )
-		if ( stop ) {
-			return null;
-		}
-
 		result = tryOne( residents );
 	}
 
+	// console.log('oneResult() Time elapsed:', elapsed( oldTime ) );
 	return result;
 };  // End oneResult()
 
@@ -381,13 +372,11 @@ var generateYears = function( residents, numWanted ) {
 	// 	// 	progress 	= blankProgress( randomized );
 
 	// 	// // DEBUGGING
-		// console.log('-------------------Starting oneResult() while loop-------------------')
+	// 	// console.log('-------------------Starting oneResult() while loop-------------------')
 	// 	// console.log('Time elapsed:', elapsed( oldTime ), ', loop number:', loopNumber);
 	// 	// // END DEBUGGING
 		
 		var result = oneResult( residents );
-		// console.log('----------Ending oneResult()------------')
-		// console.log( residents[0].name)
 
 	// 	// TODO: Remember successes and never try them again
 	// 	results.push( result );
@@ -408,7 +397,7 @@ var generateYears = function( residents, numWanted ) {
 	// // console.log('generateYears() Time elapsed:', elapsed( oldTime ) );
 
 	// return results;
-	return result;
+	retur result;
 };  // End generateYears()
 
 
@@ -598,20 +587,15 @@ var sortOptions = function( options ) {
 };  // End sortOptions()
 
 
-var unPossible = function( residents ) {
+var toResidents = function( options ) {
 
-	for (var resi = 0; resi < residents.length; resi++ ) {
-		residents[ resi ].possible = [];
-	}
+	var residents = [];
 
-	return residents;
-};  // End unPossible()
+	// Right now just the first option
 
 
-var stop = false;
-var cancel = function() {
-	stop = true;
-};
+}
+
 
 
 // =============================================================
@@ -624,14 +608,14 @@ var generate = function( resids, numWanted ) {
 // This is all with a specific set of input for the program
 // If we get different input, all bets are off, though maybe
 // we should save the results we got from the old inputs
-// console.log('----- generating from:', resids);
+
 	residents = resids;
 
 	// Assign all possible schedules to each resident
 	for ( var resi = 0; resi < residents.length; resi++ ) {//residents.length; resi++ ) {
 		// Start with a seed resident
 		var resident = residents[ resi ];
-if (resident.name === 'Roxi') { console.log('************', resident.name, ':', resident.vacationMonths)}
+
 		// Get their list of possible schedules using their vacation months
 		// var possible = vacationLimitation( residents.vacationMonths, 0, {All: [ [1, 2, 3, 4] ] } );  // Actually use dict of months to patterns
 		var possible 	  = vacationLimitation( resident.vacationMonths );  // Actually use dict of months to patterns
@@ -652,23 +636,17 @@ if (resident.name === 'Roxi') { console.log('************', resident.name, ':', 
 
 	var numWanted = numWanted || 10;  // Later will be option users can set
 
-	var oneOption = generateYears( residents, numWanted );
-	oneOption = unPossible( oneOption );
-
-	if ( oneOption === null ) {}
-	// var sorted 	= sortOptions( oneOption );  // Can't do this while testing with no metMins
-	// var simplified = simplify( oneOption );  // Move this to generating csv's
-	// oneOption = unPossible( oneOption );
-
-// console.log(oneOption);
+	var options = generateYears( residents, numWanted );
+	// var sorted 	= sortOptions( options );  // Can't do this while testing with no metMins
+	// var simplified = simplify( options );  // Move this to generating csv's
 
 	// return sorted;
-	return oneOption;
+	return options;
 	// return simplified;
 };  // End getOptions()
 
-// var oneOption = generate(constraints.residents, 1)
-// console.log(oneOption[0].selected);
+var options = generate(constraints.residents, 1)
+console.log(options[0].scheds[0]);
 
 
-module.exports = {generate: generate, cancel: cancel};
+module.exports = generate;
