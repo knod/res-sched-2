@@ -30,8 +30,10 @@ var combosFile 	= fs.readFileSync(__dirname + '/../data/combos.json');
 var combosArr 	= JSON.parse(combosFile);
 
 // Path to where combo data by vacation month is kept, in format for fs.readFile()
-var monthsDir 	= '../../../../../../Comfadorable/Dropbox/ResSchedule';
-// console.log('--------- directory:', fs.readdirSync('../../../../../../Comfadorable/Dropbox')); //+ '/../res-sched-app/'));// + '/../javascripts'));
+var monthsDir 	= '../../../../../../Comfadorable/Dropbox/ResSchedule';  // For server call
+// Path to where combo data by vacation month is kept, in format for fs.readFile()
+var monthsDir 	= '../../../../../../../../../Users/Comfadorable/Dropbox/ResSchedule';  // For local call
+// console.log('--------- directory:', fs.readdirSync('../../../../../../../../../Users/Comfadorable/Dropbox')); //+ '/../res-sched-app/'));// + '/../javascripts'));
 
 // var residents 	= [constraints.residents[0], constraints.residents[1]],
 var residents 	= constraints.residents,
@@ -72,7 +74,6 @@ var bareMinimum = function ( tracker ) {
 			// If even one minimum requirement isn't met, this schedule isn't valid
 			if ( actual < min ) { meetsMins = false; }
 		}
-
 
 	}  // end for every tracker and requirement rotation record
 
@@ -124,16 +125,8 @@ var tooMany = function ( sched, tracker, resident ) {
 		// If any of the rotationsn go over the limit, this schedule won't work
 		if ( tempAdd > max ) {
 			exceedsLimit = true;
-			// // DEBUGGING
-			// if ( resi === 9 ) {
-			// 	console.log( 'tooMany() failed. Month:', monthi, '; Rotation:', rotationIndx )
-			// }
-
-			// Without break, 115 tries takes ~ 74882ms
-			// With break, 115 tries takes ~ 48572 (~1.5 times faster)
 			break;
 		}
-		//console.log('exceeds limit? how? max:', max, ', temp:', tempAdd, ', rotIndx:', rotationIndx, ', month:', monthi )}
 
 		// Make sure UH student isn't in both Cardio and Derm
 		// If the rotation index indicates this rotation is Cardio or Derm
@@ -226,19 +219,15 @@ var rankResult = function( resultArray ) {
 var tryingOne = 0;  // DEBUGGING
 var tryOne = function( residents ) {
 // For meeting max requirements
-	// var oldTime1 = Date.now();
 
 	var result = {
 		scheds: [],
 		rank: 0
 	};
-		// var oldTime2 = Date.now();
+
 	var thisTracker = JSON.parse(JSON.stringify( tracker ));  // global object `tracker`
-		// var newTime2 = Date.now();
-		// console.log('residents tracker object:', elapsed(oldTime2, newTime2))
 
 	var reached = 0;
-		// var oldTime3 = Date.now();
 	for ( var resi = 0; resi < residents.length; resi++ ) {
 		reached = resi;
 
@@ -252,42 +241,27 @@ var tryOne = function( residents ) {
 
 		// http://stackoverflow.com/a/5915122/3791179
 		// Get random schedule
-			// var oldTime4 = Date.now();
 		while ( searching ) {
 			if (stop) {
 				return null;
 			}
 
-			// !!: TRYING: same for everyone, even last resident
+			// Only try a certain number of times before starting
+			// all over again with the first resident
+			if (attemptNum > 10000) {
+				// console.log('OVER 9000; reached resident', reached);
+				// console.log('tryOne() Time elapsed:', elapsed( oldTime1 ) );
+				return null;
+			}
 
-			// if ( !(resi === (residents.length - 1)) ) {
-				// Only try a certain number of times before starting
-				// all over again with the first resident
-				if (attemptNum > 10000) {
-					// console.log('OVER 9000; reached resident', reached);
-					// console.log('tryOne() Time elapsed:', elapsed( oldTime1 ) );
-					return null;
-				}
-
-				// Make sure we don't go over our limit of attempts
-				attemptNum += 1
-				// Get a random index for the resident's schedule
-				schedIndx = Math.floor(Math.random() * possible.length)
-			// // for the last resident, go through all of them
-			// } else {
-			// 	// -1 because schedIndx gets increased after this check
-			// 	if ( !(schedIndx < (possible.length - 1)) ) {
-			// 		console.log('NONE FOUND FOR #10', elapsed(oldTime) );
-			// 		// console.log( thisTracker )
-			// 		// console.log('tryOne() Time elapsed:', elapsed( oldTime1 ) );
-			// 		return null;
-			// 	}
-			// 	schedIndx += 1;
-			// }
+			// Make sure we don't go over our limit of attempts
+			attemptNum += 1
+			// Get a random index for the resident's schedule
+			schedIndx = Math.floor(Math.random() * possible.length)
 			
 			var sched 		= possible[ schedIndx ];
 			var meetsReqs 	= !tooMany( resident, sched, thisTracker );
-				// var oldTime5 = Date.now();
+
 			// If there's a match
 			if ( meetsReqs ) {
 				// Increment the tracker so we can match against the next one
@@ -303,26 +277,15 @@ var tryOne = function( residents ) {
 				searching = false;
 
 			}  // end if meets reqs
-				// var newTime5 = Date.now();
-				// console.log('if meetsReqs:', elapsed(oldTime5, newTime5));
-
 		}  // end while searching
-			// var newTime4 = Date.now();
-			// console.log('while searching:', elapsed(oldTime4, newTime4));
 
 		// resident.selected = selected;
 
 	}  // end for every resident
-		// var newTime3 = Date.now();
-		// console.log('loop through every resident:', elapsed(oldTime3, newTime3));
 
 	// Rank based on rank of each schedule (though this doesn't
 	// work right now because stuff isn't in order of rank)
-		// var oldTime7 = Date.now();
 	// result.rank = rankResult( result );
-// console.log(residents[0].name)
-		// var newTime7 = Date.now();
-		// console.log('result.rank:', elapsed(oldTime7, newTime7));
 
 	// CAN'T TEST MINS TILL WE TRY 10 ALL TOGETHER
 	// // If the final result doesn't meet our minimum requirements
@@ -331,8 +294,6 @@ var tryOne = function( residents ) {
 		// // Send it back to try again
 		// result = null;
 	// }
-
-	// console.log('tryOne() Time elapsed:', elapsed( oldTime1 ) );
 
 	// return result;
 	return residents;
@@ -360,54 +321,15 @@ var oneResult = function( residents ) {
 // temp
 var attempts = 1;
 var oldTime = Date.now();
-// // ??: Should use indexes of residents below so we can keep track
-// // of what's been tried?
-// var resCombosUsed = [];
 var generateYears = function( residents, numWanted ) {
-// Returns
-// [ { scheds: [ {resident: {}, schedule: [], rank: #} ], rank: # } ]
-	// // DEBUGGING
-	// var oldTime = Date.now();
-	// console.log('START. Time elapsed:', elapsed( oldTime ));
-	// var loopNumber = 1;
-
-	// var results = [];
-
-	// var done = 0;
-	// while ( done < numWanted ) {
-
-	// 	// // 1/3.6 mill chance of getting the same combo of residents
-	// 	// var randomized 	= shuffle( residents.slice() ),
-	// 	// 	progress 	= blankProgress( randomized );
-
 	// 	// // DEBUGGING
-		// console.log('-------------------Starting oneResult() while loop-------------------')
+	//	// console.log('-------------------Starting oneResult() while loop-------------------')
 	// 	// console.log('Time elapsed:', elapsed( oldTime ), ', loop number:', loopNumber);
 	// 	// // END DEBUGGING
 		
 		var result = oneResult( residents );
 		// console.log('----------Ending oneResult()------------')
 		// console.log( residents[0].name)
-
-	// 	// TODO: Remember successes and never try them again
-	// 	results.push( result );
-	// 	done += 1;
-
-	// 	// // DEBUGGING
-	// 	// loopNumber += 1;
-	// 	// console.log('XXXXXXXXXXXXXXXXXX', results.length, 'RESULTS FOUND XXXXXXXXXXXXXXXXXX')
-	// 	// // END DEBUGGING
-
-	// }
-
-	// // Store results somewhere (id by what info was provided?)
-
-	// // DEBUGGING
-	// console.log('END. Time elapsed:', elapsed( oldTime ));
-
-	// // console.log('generateYears() Time elapsed:', elapsed( oldTime ) );
-
-	// return results;
 	return result;
 };  // End generateYears()
 
@@ -455,7 +377,7 @@ Makes sure the schedule contains the slots desired
 	// If there aren't any specified, every schedule is fine
 	if ( !(wanted.length > 0) ) { return true; }
 
-	var accept = false;
+	var accept = true;
 
 	for ( var wantedi = 0; wantedi < wanted.length; wantedi++ ) {
 
@@ -463,9 +385,8 @@ Makes sure the schedule contains the slots desired
 			rotationi 	= rotationMap[ desired.rotation ],
 			monthi 		= monthMap[ desired.month ];
 
-		// If that month in the schedule contains the accepted rotation, accept
-		// If any of accepted slots are hit, it will be accepted
-		if ( sched[ monthi ] === rotationi ) { accept = true; }
+		// If a month in the schedule doesn't have the requested rotation, no good
+		if ( sched[ monthi ] !== rotationi ) { accept = false; }
 	}
 
 	return accept;
@@ -474,11 +395,12 @@ Makes sure the schedule contains the slots desired
 
 var customLimiters = function( resident, possible ) {
 /*
-
 Takes out schedules that don't mesh with either already
 requested months/rotations or months/rotations that are
 specifically not desired
 */
+// var length1 = possible.length; var length2 = resident.possible.length; 
+// console.log('res possible:', length2, '; original possible:', length1);
 	var unwanted = resident.rejected,
 		booked 	 = resident.requested,
 		actual 	 = [];
@@ -487,10 +409,10 @@ specifically not desired
 
 		var sched = possible[ schedi ];
 
-		var hasDesired = upToSnuff( sched, resident.requested );
+		var hasDesired = upToSnuff( sched, booked );
 		if ( hasDesired ) {
 			// and doesn't contain slots the resident has rejected
-			var reject = mustExterminate( sched, resident.rejected );
+			var reject = mustExterminate( sched, unwanted );
 			if ( !reject ) {
 				// add it to the list of their possible schedules
 				actual.push( sched );
@@ -560,15 +482,11 @@ var vacationLimitation = function( vacations ) {
 		result = combosArr;
 	} else {
 		// Get file with info ordered by vacation months
-		// var file 	= fs.readFileSync( monthsDir + '/' + filename + '.json' ),
-		// 	indexes = JSON.parse( file );
 		var indexes = convertMonth( monthsDir + '/' + filename + '.csv' );
 
 		// This array just contains the indexes of the actual combos in the main combo array
 		// Get the actual combos
 		for ( var i = 0; i < indexes.length; i++ ) {
-			// if ( i === 0 ) { console.log( 'filename:', filename, ', check first entry, should be one more that;', combosArr[ indexes[i] - 1 ] ) }  // Shows we get the right indexes - check against file
-
 			// brobot started schedule combo indexes at 1
 			result.push( combosArr[ indexes[i] - 1 ] );
 		}
@@ -631,12 +549,14 @@ var generate = function( resids, numWanted ) {
 	for ( var resi = 0; resi < residents.length; resi++ ) {//residents.length; resi++ ) {
 		// Start with a seed resident
 		var resident = residents[ resi ];
-if (resident.name === 'Roxi') { console.log('************', resident.name, ':', resident.vacationMonths)}
+// if (resident.name === 'Roxi') { console.log('************', resident.name, ':', resident.vacationMonths)}
+
 		// Get their list of possible schedules using their vacation months
-		// var possible = vacationLimitation( residents.vacationMonths, 0, {All: [ [1, 2, 3, 4] ] } );  // Actually use dict of months to patterns
-		var possible 	  = vacationLimitation( resident.vacationMonths );  // Actually use dict of months to patterns
+		var possible 	  = vacationLimitation( resident.vacationMonths );
 		possible 		  = addVacations( resident, possible );
 		resident.possible = customLimiters( resident, possible );
+
+// if(resident.name === 'Roxi') { var copy = resident.possible.slice(); fs.writeFile( 'temp.json', JSON.stringify(copy) );}
 
 		// If this is the case, something has gone wrong earlier on.
 		// Try to figure it out and tell the person running the program
@@ -658,9 +578,6 @@ if (resident.name === 'Roxi') { console.log('************', resident.name, ':', 
 	if ( oneOption === null ) {}
 	// var sorted 	= sortOptions( oneOption );  // Can't do this while testing with no metMins
 	// var simplified = simplify( oneOption );  // Move this to generating csv's
-	// oneOption = unPossible( oneOption );
-
-// console.log(oneOption);
 
 	// return sorted;
 	return oneOption;

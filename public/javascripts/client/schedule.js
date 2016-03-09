@@ -47,7 +47,10 @@ var ScheduleHandler = function( settingsHandler ) {
 	* Generates a schedule with residents
 	* 
 	*/
-		console.log('sending:', residents)
+		// console.log('sending:', residents)
+
+		$('.loading').attr('display', 'auto')
+
 		// Asynchronous $.ajax
 		$.ajax({
 			// ??!!: Is this right?

@@ -17,8 +17,13 @@
 * - When the user hand-selects a rotation, automatically lock
 * 	that month. If then unlocked, keep the selection the same.
 * 
+* ??:
+* - If a user generates options, but then selects a certain rotation
+* 	for a month, all the generated, non-locked months should be negated, right?
+* 
 * NOTES:
 * - Push just front end: https://gist.github.com/cobyism/4730490
+* 
 */
 
 'use strict'
@@ -55,7 +60,9 @@ var Settings = function() {
 	* 	selected: []
 	*}; 
 	*/
-		var month 	= $cell.data('month');
+		var month 		= $cell.data('month'),
+			sanitzd 	= res.name.replace(/\W+/g, "_"),
+			requestID 	= sanitzd + '_' + month + '_rot_request';
 
 		// - Vacations -
 		var isVac = $($cell.find('input[name=vacation]:checked')).length > 0;
@@ -72,6 +79,8 @@ var Settings = function() {
 		
 		// - Locked (just for storage) -
 		var locked 	= $($cell.find('.locker')).hasClass('fa-lock');
+		// _Not_ || res.locked because we want to be able to revert to this
+		// if they unlock the resident
 		if ( locked === true ) {
 			res.lockedMonths.push( month );
 		}
@@ -81,10 +90,10 @@ var Settings = function() {
 		if ( locked === true || res.locked === true ) {
 			// Should not be able to lock if input is "None". Nevertheless, good to check?
 			// So that it's independent of whatever comes in. But then what do we do about res.locked?
-			var $selected = $($cell.find('input[name=rot_request]:checked')).val() || 'None';
-			if ( $selected !== 'None' ) {
+			var selected = $cell.find('input[name=' + requestID + ']:checked').eq(0).val() || 'None';
+			if ( selected !== 'None' ) {
 				// Name of selected rotation or empty string if "None" selected
-				requested.push({ month: month, rotation: $selected });
+				res.requested.push({ month: month, rotation: selected });
 			}
 
 		}
@@ -124,7 +133,12 @@ var Settings = function() {
 		var $header = $($row.find('th')[0]);
 		res.name 	= $($header.find('input[name=res_name]')).val();
 		res.locked 	= $($header.find('.locker')).hasClass('fa-lock');
-		res.dh_uh 	= $($header.find('input[name=dh_uh]')).val();
+		if ( res.locked ) {
+			console.log( 'locked:', res.name );
+		}
+
+		var dhuhName = res.name.replace(/\W+/g, "_") + '_dh_uh';
+		res.dh_uh 	= $($header.find('input[name=' + dhuhName + ']:checked')).val();
 		
 		// The td's in the tr
 		var $cells 	 = $row.find('td');
@@ -216,17 +230,90 @@ var Settings = function() {
 
 	var lockIf = function( $tr, resident ) {
 
-		var id = $tr.attr('id');
+		var id 	 = $tr.attr('id'),
+			$tds = $tr.find('td');
 
-		if (resident.locked) {
+		if ( resident.locked ) {
 			$tr.find('input').prop('disabled', true)
 			$tr.find('.locker').removeClass('fa-unlock').addClass('fa-lock');
 			$tr.addClass('locked');
+		} else {
+
+			for ( var monthi = 0; monthi < months.length; monthi++ ) {
+				// var monthNum = (monthi + 6)  % 12,
+				// 	month 	 = months[ monthNum ];
+				var month = months[ monthi ],
+					$td   = $($tds[ monthi ]);
+
+				buildCell( $td, month, resident )
+			}
 		}
 
-
 		return $tr;
-	}
+	}  // End lockIf()
+
+
+	var toggleMonthLock = function( evnt, $locker, resident, month ) {
+
+		var $td = $locker.parents('td').eq(0)
+
+		var lockedMonths = resident.lockedMonths,
+			$input 		 = $td.find('input');
+
+		// If it's locked
+		if ( $locker.hasClass('fa-lock')) {
+			// unlock it
+			$locker.removeClass('fa-lock');
+			$locker.addClass('fa-unlock');
+			$td.removeClass('locked');
+
+			var index = lockedMonths.indexOf(month)
+			lockedMonths.splice(index, 1);
+
+			$input.prop('disabled', false);
+
+		} else {
+			// Otherwise lock it
+			$locker.removeClass('fa-unlock');
+			$locker.addClass('fa-lock');
+			$td.addClass('locked');
+
+			lockedMonths.push( month );
+
+			$input.prop('disabled', true);
+		}
+
+		// Save what we've done
+		settings.update( $td.parents('tbody')[0], true );
+
+	};  // End toggleMonthLock()
+
+
+	var toggleResLock = function( evnt, $locker, resident ) {
+
+		var $tr = $locker.parents('tr').eq(0)
+
+		// If currently locked
+		if ( $locker.hasClass( 'fa-lock' ) ) {
+			// Unlock it
+			resident.locked = false;
+			$locker.removeClass('fa-lock');
+			$locker.addClass('fa-unlock');
+			$tr.removeClass('locked');
+		} else {
+			// Otherwise lock it
+			resident.locked = true;
+			$locker.removeClass('fa-unlock');
+			$locker.addClass('fa-lock');
+			$tr.addClass('locked');
+		}
+
+		// Lock all the months (from the top level, though, not affecting .lockedMonths)
+		lockIf( $tr, resident )
+		// Save what we've done
+		settings.update( $tr.parents('tbody')[0], true );
+
+	};  // End toggleResLock;
 
 
 	var monthMap = {'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
@@ -234,7 +321,7 @@ var Settings = function() {
 	var months 	 = [ 'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec' ];
 	var rotationNames = [ 'None', 'FMS', 'Rural', 'Elec', 'Cardio', 'W-P', 'Ger', 'pcmh', 'Derm' ];
 
-	var buildCell = function( $cell, month, resident ) {
+	var buildCell = function( $cell, month, resident, fromBuildCells ) {
 	// For each property of the resident, check if this month is in there
 	// If so, do stuff
 
@@ -251,8 +338,8 @@ var Settings = function() {
 		// - REQUESTED -
 		// Give this set of radio groups a unique name
 		var sanitzd = resident.name.replace(/\W+/g, "_"),
-			name 	= sanitzd + '_' + month + '_rot_request';
-		$cell.find('input[name=rot_request]').prop('name', name);
+			reqID 	= sanitzd + '_' + month + '_rot_request';
+		$cell.find('input[name=rot_request]').prop('name', reqID);
 
 		// - GENTERATED -
 		var selected = resident.selected,
@@ -289,14 +376,21 @@ var Settings = function() {
 		}  // end for every rejection
 
 		// - LOCKING -
-		var lockedMonths = resident.lockedMonths;
+		var lockedMonths = resident.lockedMonths,
+			$input 		 = $cell.find('input'),
+			$locker 	 = $cell.find('.locker').eq(0);
 		if ( lockedMonths.indexOf(month) > -1 ) {
-			$cell.find('input').prop('disabled', true);
+			$input.prop('disabled', true);
 
-			var $locker = $($cell.find('.locker')[0]);
 			$locker.removeClass('fa-unlock');
 			$locker.addClass('fa-lock');
 			$cell.addClass('locked');
+		} else {
+			$input.prop('disabled', false)
+
+			$locker.removeClass('fa-lock');
+			$locker.addClass('fa-unlock');
+			$cell.removeClass('locked');
 		}
 
 		// Lock a month if it's requested
@@ -322,6 +416,26 @@ var Settings = function() {
 			}
 		}
 
+		// EVENTS
+		// If it's the first time making this element,
+		// make user able to lock the month
+		if (!fromBuildCells) {
+
+			var $locker = $cell.find('.locker').eq(0);
+			$locker.click(function lockClicked( evnt ) {
+				toggleMonthLock( evnt, $locker, resident, month );
+			});  // lock and unlock month
+
+			var $reqChoices = $cell.find('input[name=' + reqID + ']');
+			$reqChoices.click( function choiceClicked( evnt ) {
+
+				$cell.find('.rot-output').eq(0).text( $(this).val() );
+				toggleMonthLock( evnt, $locker, resident, month);
+
+			})
+
+		}
+
 		return $cell;
 	};  // End buildCell()
 
@@ -341,7 +455,7 @@ var Settings = function() {
 			$td.attr('data-month', month);
 			// console.log($td.prop('data-month'))  // still not working
 
-			buildCell( $td, month, resident )
+			buildCell( $td, month, resident, true )
 		}
 
 		return $tr;
@@ -373,12 +487,18 @@ var Settings = function() {
 			$locker.addClass('fa-unlock');
 		}
 
+		// Make user able to lock the resident
+		$locker.click(function lockClicked( evnt ) {
+			toggleResLock( evnt, $locker, resident );
+		});  // lock and unlock resident
+
+
 		return $tr;
 	};
 
 	var haveDoneThis = false;
 
-	var buildRows = function( err, tr, td, tbody, residents ) {
+	settings.buildRows = function( err, tr, td, tbody, residents ) {
 	/* (str?, str, str, {}) -> None
 	* 
 	* 
@@ -396,8 +516,6 @@ var Settings = function() {
 				var resident = residents[ resi ];
 				var $trNode = $(tr);
 
-				if ( resident.name === 'Roxi' ) {console.log(resident.name, ':', resident.vacationMonths)}
-
 				$tbody.append( $trNode );
 
 				// Not sure what my stuff looks like now, so I'm just going to
@@ -412,34 +530,45 @@ var Settings = function() {
 
 			}  // end for every table row
 
-			$('input').change(function(evnt) {
-				// settings.update( $tbody[0] );
-				page.update( $tbody[0] );
+			// console.log($tbody.find('input'))
+			$tbody.find('input').change(function(evnt) {
+				page.update( $('.jade-views')[0] );
+			});
+
+			$tbody.find('input').on('input', function(evnt) {
+				page.update( $('.jade-views')[0] );
 			});
 
 			var generate = function() {
-				schedHandler.generate( settings.residents );
+				var residents = page.update( $('tbody')[0] );
+				// console.log('generating from settings.:', settings.residents[0].vacationMonths)
+				// console.log('generating from new residents:', residents[8].dh_uh)
+				schedHandler.generate( residents );  // Why does this work
+				// schedHandler.generate( settings.residents );  // When this one doesn't?
 			}
-
-			console.trace( '****** Roxi vacations:', residents[0].vacationMonths)
 
 			if (!haveDoneThis) {
 				haveDoneThis = true;
+
 				$('button[name=generate]').click( generate );
+
 				$('button[name=cancel]').click(function cancel() {
 					schedHandler.cancel();
 				});
 			}
 
+			var page = Page();
+			page.update( $tbody[0] )
+			csvSchedToJSON( residents );
 		}  // end if/if not err
 
 		// Don't pretend to return something for asynchronous call
-	};  // End buildRows() (callback)
+	};  // End settings.buildRows() (callback)
 
 
 	settings.getSettings = function( err, td, tr, tbody, residents ) {
 
-		var callback = buildRows;
+		var callback = settings.buildRows;
 
 		if ( err ) {
 			console.error('get td errored:', err );
@@ -476,7 +605,7 @@ var Settings = function() {
 	settings.getCell = function( err, tr, tbody, residents, skipSettings ) {
 
 		var callback1 = settings.getSettings,
-			callback2 = buildRows;
+			callback2 = settings.buildRows;
 
 		if ( err ) {
 			console.error('get tr template errored:', err );
@@ -490,7 +619,7 @@ var Settings = function() {
 			})  // End $.ajax() (sort of)
 			// If no .then(), no way to get residents back
 			.then( function successHandler( td ) {
-				console.log('got tr')
+				// console.log('got tr')
 				
 				// Will not mutate the back end td object
 				if ( skipSettings ) {

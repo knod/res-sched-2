@@ -8,9 +8,9 @@ var residents = [
 	// each working schedule should be kept with final results
 	{
 		name: 'Roxi', dh_uh: 'dh', locked: true,
-		vacationMonths: ['Jul'], extraVacationMonths: ['Aug'],
-		requested: [],
-		rejected: [/*{month: 'x', roations: ['x', 'x']}*/],  // maybe this should have been { 'Jun': [] }
+		vacationMonths: ['Jan', 'Feb', 'Apr'], extraVacationMonths: [],
+		requested: [{month: 'Jan', rotation: 'Elec'}, {month: 'Mar', rotation: 'FMS'}],
+		rejected: [{month: 'Apr', rotations: ['Derm', 'Ger']}],
 		possible: [],//, schedule: []
 		lockedMonths: [],
 		selected: []  // there will be repeats from requested
@@ -18,8 +18,8 @@ var residents = [
 	{
 		name: 'Sarah', dh_uh: 'dh', locked: false,
 		vacationMonths: [], extraVacationMonths: [],
-		requested: [{month:'Aug', rotation:'Rural'}],
-		rejected: [{month:'Aug', rotations: ['FMS','Elec']}],
+		requested: [/*{month:'Aug', rotation:'Rural'}*/],
+		rejected: [/*{month:'Aug', rotations: ['FMS','Elec']}*/],
 		possible: [],//, schedule: []
 		lockedMonths: ['Jul'],
 		selected: []  // there will be repeats from requested
@@ -271,10 +271,10 @@ var maxes = [
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]   // 9, UH in either Derm or Cardio
 ];
 
-var rotationMap = {
+var rotationMap = { 'None': 0,
 	'FMS': 1, 'Rural': 2, 'Elec': 3, 'Cardio': 4,
-	'W-P': 5, 'Ger': 6, 'pcmh': 7, 'Derm': 8,
-	'None': 0
+	'W-P': 5, 'Ger': 6, 'pcmh': 7, 'Derm': 8
+	
 };
 
 var monthMap = {

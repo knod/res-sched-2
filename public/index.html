@@ -16,24 +16,29 @@
 
 	<h1>Schedule</h1>
 	
-	<button name='generate'>Generate New</button><button name='cancel'>Cancel</button>
+	<button name='generate'>Generate New</button>
+	<!-- <button name='cancel'>Cancel</button> -->
+
+	<!-- <div class='generating-area'> -->
+		<img class='loading' src='/images/loading_icon.gif'></img>
+	<!-- </div> -->
 
 	<table class='schedule'>
 		<thead>
 			<tr>
-				<th scope="col" class='month' data-month='none'>2016</th>
-				<th scope="col" class='month' data-month='Jan'>January</th>
-				<th scope="col" class='month' data-month='Feb'>February</th>
-				<th scope="col" class='month' data-month='Mar'>March</th>
-				<th scope="col" class='month' data-month='Apr'>April</th>
-				<th scope="col" class='month' data-month='May'>May</th>
-				<th scope="col" class='month' data-month='Jun'>June</th>
-				<th scope="col" class='month' data-month='Jul'>July</th>
-				<th scope="col" class='month' data-month='Aug'>August</th>
-				<th scope="col" class='month' data-month='Sep'>September</th>
-				<th scope="col" class='month' data-month='Oct'>October</th>
-				<th scope="col" class='month' data-month='Nov'>November</th>
-				<th scope="col" class='month' data-month='Dec'>December</th>
+				<th scope="col" class='month None' data-month='none'>2016</th>
+				<th scope="col" class='month Jan' data-month='Jan'>January</th>
+				<th scope="col" class='month Feb' data-month='Feb'>February</th>
+				<th scope="col" class='month Mar' data-month='Mar'>March</th>
+				<th scope="col" class='month Apr' data-month='Apr'>April</th>
+				<th scope="col" class='month May' data-month='May'>May</th>
+				<th scope="col" class='month Jun' data-month='Jun'>June</th>
+				<th scope="col" class='month Jul' data-month='Jul'>July</th>
+				<th scope="col" class='month Aug' data-month='Aug'>August</th>
+				<th scope="col" class='month Sep' data-month='Sep'>September</th>
+				<th scope="col" class='month Oct' data-month='Oct'>October</th>
+				<th scope="col" class='month Nov' data-month='Nov'>November</th>
+				<th scope="col" class='month Dec' data-month='Dec'>December</th>
 			</tr>
 		</thead>
 
@@ -45,16 +50,17 @@
 	<script src='javascripts/client/schedule.js'></script>
 	<script src='javascripts/client/settings.js'></script>
 	<script src='javascripts/client/page.js'></script>
+	<script src='javascripts/client/to-table.js'></script>
 	<script>
-		var residents = [
+		var starter = [
 			// MAX 3 VACATIONS IN `vacationMonths`!!! OTHERS CAN GO IN `extraVacationMonths`
 			// `rejects` is monts and rotations that the resident definitely doesn't want to do
 			// each working schedule should be kept with final results
 			{
 				name: 'Roxi', dh_uh: 'dh', locked: false,
 				vacationMonths: [], extraVacationMonths: [],
-				requested: [{month:'Jul', rotation:'Elec'}],
-				rejected: [/*{month: 'x', roations: ['x', 'x']}*/],  // maybe this should have been { 'Jun': [] }
+				requested: [],
+				rejected: [],
 				possible: [],//, schedule: []
 				lockedMonths: [],
 				selected: []  // there will be repeats from requested
@@ -62,7 +68,7 @@
 			{
 				name: 'Sarah', dh_uh: 'dh', locked: false,
 				vacationMonths: [], extraVacationMonths: [],
-				requested: [{month:'Aug', rotation:'Rural'}],
+				requested: [],
 				rejected: [],
 				possible: [],//, schedule: []
 				lockedMonths: [],
@@ -142,12 +148,6 @@
 			}
 		];
 
-		// var settings = Settings();
-		var page 		= Page();
-		var tbody 	 	= $('.jade-views')[0];
-		page.load( tbody, residents );
-
-		var schedHandler = ScheduleHandler();
 		// Need to:
 		// - Events -
 		// detect events
@@ -159,6 +159,14 @@
 		// display data
 		// save data
 		// convert data to csv and make available
+
+		// var settings = Settings();
+		var page 		= Page();
+		// var tbody 	 	= $('.jade-views')[0];
+		// page.load( tbody, starter );
+
+		var schedHandler = ScheduleHandler();
+		schedHandler.generate( starter );
 
 	</script>
 </body>
