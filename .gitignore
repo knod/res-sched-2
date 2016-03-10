@@ -1,6 +1,6 @@
 ########### Schedule Data (too big)
 *.txt
-*.json
+# *.json (for heroku to get combos.json file)
 !package.json
 
 ########### Node
@@ -33,3 +33,8 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Heroku
+/node_modules
+npm-debug.log
+/*.env
