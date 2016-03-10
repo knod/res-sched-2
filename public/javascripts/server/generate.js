@@ -261,23 +261,14 @@ var firstSchedIndx;
 			}
 
 			if ( resi > 6 ) { reachedCount[ resi + '' ] += 1 }
-			// // Only try a certain number of times before starting
-			// // all over again with the first resident
-			// if (attemptNum > 10000) {
-				// if ( resi > 6 ) {
-				// 	console.log('OVER 9000; reached resident', reachedCount);
-				// }
-			// 	// console.log('tryOne() Time elapsed:', elapsed( oldTime1 ) );
-			// 	return null;
-			// }
 
 			if ( !(resi === (residents.length - 1)) ) {
 				// Only try a certain number of times before starting
 				// all over again with the first resident
 				if (attemptNum > 100000) {
-					if ( resi > 6 ) {
-						console.log('OVER 9000; reached resident', reachedCount);
-					}
+					// if ( resi > 6 ) {
+					// 	console.log('OVER 9000; reached resident', reachedCount);
+					// }
 					// console.log('OVER 9000; reached resident', reached);
 					// console.log('tryOne() Time elapsed:', elapsed( oldTime1 ) );
 					return null;
