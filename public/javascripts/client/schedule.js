@@ -19,17 +19,11 @@ var ScheduleHandler = function( settingsHandler ) {
 
 	handler.load = function( err, residents ) {
 	/* 
-	* 
-	* options = [ { scheds: [ {resident: {}, schedule: [], rank: #} ], rank: # } ]
-	* 
+	* residents = [ {resident: {}, schedule: []} ]
 	*/
-		// var schedule = options[0];
-
-		// // For now. There must be a better way.
-		// var residents = [];
-		// for ( var resi = 0; resi < schedule.length; resi++ ) {}
+		// For now. There must be a better way.
 		if ( err ) {
-			console.log('handler.load err:', err )
+			console.log('generation err:', err )
 		} else {
 			if ( residents !== null ) {
 				// Loading new settings
@@ -45,11 +39,12 @@ var ScheduleHandler = function( settingsHandler ) {
 	/* 
 	* 
 	* Generates a schedule with residents
-	* 
+	* TODO: Add way to tell if uh cardio/derm limit should be attempted
 	*/
-		// console.log('sending:', residents)
-
-		$('.loading').attr('display', 'auto')
+		// Show loading visuals
+		$('.loading').removeClass('ghost');
+		$('table').addClass('hidden');
+		$('.generate').addClass('hidden');
 
 		// Asynchronous $.ajax
 		$.ajax({
@@ -58,7 +53,7 @@ var ScheduleHandler = function( settingsHandler ) {
 			method: 'PUT',  // Basically 'edit'
 			dataType: 'json',
 			contentType: 'application/json',
-			data: JSON.stringify( residents )
+			data: JSON.stringify( {residents: residents, limiter: false} )
 		})  // End $.ajax() (sort of)
 		.then( function successHandler( residentData, responseText ) {
 		// Only fires on a successful request. If this gets run, we've actually saved
@@ -68,9 +63,18 @@ var ScheduleHandler = function( settingsHandler ) {
 			// console.log('generated:', residentData);
 			handler.load( null, residentData );  // ??: Does this have a ._id?
 
+			// Hide loading visuals
+			$('.loading').addClass('ghost');
+			$('table').removeClass('hidden');
+			$('.generate').removeClass('hidden');
+
 		}, function errHandler( err ) {
 			console.error( 'tried to generate:', err );
 			handler.load( err, null );
+
+			// Hide loading visuals
+			$('.loading').addClass('ghost');
+			$('table').removeClass('hidden');
 		});  // End .then(), which ends $.ajax()
 
 	};  // End handler.generate()

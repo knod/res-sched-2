@@ -12,6 +12,7 @@
 * 	- Maybe make sure it hasn't got easy months on both sides,
 * 		or turn it into Elective then rank based on bro's ranking
 * 		algorithm
+* - !!: Turn any dh resident's 2's into 3's
 * 
 * DONE:
 * - UH - no Rural and Winter Park next to each other
@@ -36,9 +37,9 @@ var monthsDir 	= '../../../../../../../../../Users/Comfadorable/Dropbox/ResSched
 // console.log('--------- directory:', fs.readdirSync('../../../../../../../../../Users/Comfadorable/Dropbox')); //+ '/../res-sched-app/'));// + '/../javascripts'));
 
 // var residents 	= [constraints.residents[0], constraints.residents[1]],
-var residents 	= constraints.residents,
+// var residents 	= constraints.residents,
 // var residents 	= constraints.residents.splice(-9),
-	rotations 	= constraints.rotations,
+var rotations 	= constraints.rotations,
 	vacRot 		= constraints.vacationRotations,
 	tracker 	= constraints.requirementTracker,
 	uhConflicts = constraints.uhConflicts,
@@ -54,6 +55,7 @@ var residents 	= constraints.residents,
 // CHECKERS AND TRACKERS
 // ============================
 var bareMinimum = function ( tracker ) {
+	// !!! something wrong with this. requirementsRot is undefined.
 // Depends on global var `rotations`
 // rotations = [ {}, {...perMonth: [ {min: #, max: #} * 12 ]} ]
 // tracker = [ [], [# * 12] ]
@@ -108,7 +110,7 @@ var wpVsruralConflicts = function( sched, resident ) {
 };  // End wpVsruralConflicts()
 
 
-var tooMany = function ( sched, tracker, resident ) {
+var tooMany = function ( resident, sched, tracker, num ) {
 // resi for debugging
 
 	var exceedsLimit = false;
@@ -122,20 +124,36 @@ var tooMany = function ( sched, tracker, resident ) {
 		// Get the max allowed in this rotation in this month
 		var max = rotations[ rotationIndx ].perMonth[ monthi ].max;
 
+
+		// // Give more leniency to the last resident in hopes of finding a solution...
+		// // Allow another person to be put into one of the flexible rotations
+		// if ( resident.last && (rotationIndx === 2 || rotationIndx === 3 ) ) {
+		// 	max += 1;
+		// }
+
+
 		// If any of the rotationsn go over the limit, this schedule won't work
 		if ( tempAdd > max ) {
+			// console.log('Exceeds:', resident.name, monthi, sched, tracker )
 			exceedsLimit = true;
+			// if ( resident.last && num < 2 ) {
+			// 	console.log('----------------', tracker)
+			// 	console.log( sched );
+			// 	console.log( rotations[rotationIndx].name )
+			// }
 			break;
 		}
 
+		// Comment out this to try to reduce number of requirements just to see if a solution can be found that way
 		// Make sure UH student isn't in both Cardio and Derm
 		// If the rotation index indicates this rotation is Cardio or Derm
-		if ( uhConflicts.indexOf(rotationIndx) > -1
+		if ( cardioDermLimit
+				&& uhConflicts.indexOf(rotationIndx) > -1
 				// and if resident is a UH resident
 				&& resident['dh_uh'] === 'uh'
 				// and if this month already has a resident in Cardio or Derm
 				&& tracker[9][monthi] >= 1 ) {
-
+			console.log('conflicting resident', resident.name, resident.dh_uh, tracker[9], monthi)
 			// This isn't a valid schedule
 			exceedsLimit = true;
 			break;
@@ -152,7 +170,7 @@ var meetsAllReqs = function( resident, sched, tracker) {
 
 	var meetsAllReqs 	= true;
 
-	var meetsMaxes 		= !tooMany( sched, tracker, resident ),
+	var meetsMaxes 		= !tooMany( resident, sched, tracker ),
 		meetsUHConflict = !wpVsruralConflicts( sched, resident );
 
 	// Both have to be true to return true
@@ -220,10 +238,7 @@ var tryingOne = 0;  // DEBUGGING
 var tryOne = function( residents ) {
 // For meeting max requirements
 
-	var result = {
-		scheds: [],
-		rank: 0
-	};
+	var reachedCount = { '7': 0, '8': 0, '9': 0 }
 
 	var thisTracker = JSON.parse(JSON.stringify( tracker ));  // global object `tracker`
 
@@ -239,6 +254,7 @@ var tryOne = function( residents ) {
 			schedIndx 	= 0,
 			attemptNum 	= 1;
 
+var firstSchedIndx;
 		// http://stackoverflow.com/a/5915122/3791179
 		// Get random schedule
 		while ( searching ) {
@@ -246,24 +262,66 @@ var tryOne = function( residents ) {
 				return null;
 			}
 
-			// Only try a certain number of times before starting
-			// all over again with the first resident
-			if (attemptNum > 10000) {
-				// console.log('OVER 9000; reached resident', reached);
-				// console.log('tryOne() Time elapsed:', elapsed( oldTime1 ) );
-				return null;
+			if ( resi > 6 ) { reachedCount[ resi + '' ] += 1 }
+			// // Only try a certain number of times before starting
+			// // all over again with the first resident
+			// if (attemptNum > 10000) {
+				// if ( resi > 6 ) {
+				// 	console.log('OVER 9000; reached resident', reachedCount);
+				// }
+			// 	// console.log('tryOne() Time elapsed:', elapsed( oldTime1 ) );
+			// 	return null;
+			// }
+
+			if ( !(resi === (residents.length - 1)) ) {
+				// Only try a certain number of times before starting
+				// all over again with the first resident
+				if (attemptNum > 100000) {
+					if ( resi > 6 ) {
+						console.log('OVER 9000; reached resident', reachedCount);
+					}
+					// console.log('OVER 9000; reached resident', reached);
+					// console.log('tryOne() Time elapsed:', elapsed( oldTime1 ) );
+					return null;
+				}
+
+				// Make sure we don't go over our limit of attempts
+				attemptNum += 1
+				// Get a random index for the resident's schedule
+				schedIndx = Math.floor(Math.random() * possible.length)
+			// for the last resident, go through all of them
+			} else {
+				reachedCount[ resi + '' ] += 1
+				// -1 because schedIndx gets increased after this check
+				if ( !(schedIndx < (possible.length - 1)) ) {
+					console.log('NONE FOUND FOR #10', reachedCount, firstSchedIndx );
+					// console.log( thisTracker )
+					// console.log('tryOne() Time elapsed:', elapsed( oldTime1 ) );
+					return null;
+				}
+				schedIndx += 1;
+			}
+ 
+
+
+			if ( attemptNum === 1 ) {
+				firstSchedIndx = schedIndx;
 			}
 
+
 			// Make sure we don't go over our limit of attempts
-			attemptNum += 1
-			// Get a random index for the resident's schedule
-			schedIndx = Math.floor(Math.random() * possible.length)
-			
+			attemptNum += 1;
+			// // Get a random index for the resident's schedule
+			// schedIndx = Math.floor(Math.random() * possible.length)
+			// console.log('---------- more than possible? index:', schedIndx, ', possible:', (possible.length - 1) )
+			// var sched 		= possible[ resi ];
 			var sched 		= possible[ schedIndx ];
-			var meetsReqs 	= !tooMany( resident, sched, thisTracker );
+			// To be meetsAllReq(...)
+			var meetsReqs 	= !tooMany( resident, sched, thisTracker, (possible.length - schedIndx) );
 
 			// If there's a match
 			if ( meetsReqs ) {
+				// console.log('-----------------', resident.name, thisTracker)
 				// Increment the tracker so we can match against the next one
 					// var oldTime6 = Date.now();
 				trackItUp( resident, sched, thisTracker );
@@ -275,8 +333,10 @@ var tryOne = function( residents ) {
 
 				// Move on to the next resident
 				searching = false;
-
 			}  // end if meets reqs
+			else {
+				// console.log('no fit:', resident.name, sched, tracker)
+			}
 		}  // end while searching
 
 		// resident.selected = selected;
@@ -287,12 +347,12 @@ var tryOne = function( residents ) {
 	// work right now because stuff isn't in order of rank)
 	// result.rank = rankResult( result );
 
-	// CAN'T TEST MINS TILL WE TRY 10 ALL TOGETHER
+	// // CAN'T TEST MINS TILL WE TRY 10 ALL TOGETHER
 	// // If the final result doesn't meet our minimum requirements
 	// var metMins = bareMinimum( thisTracker );
 	// if ( !metMins ) {
-		// // Send it back to try again
-		// result = null;
+	// 	// Send it back to try again
+	// 	result = null;
 	// }
 
 	// return result;
@@ -306,7 +366,7 @@ var oneResult = function( residents ) {
 	var result 	= null;
 
 	while ( result === null ) {
-		console.log( 'in oneResult() while loop. stop:', stop )
+		// console.log( 'in oneResult() while loop. stop:', stop )
 		if ( stop ) {
 			return null;
 		}
@@ -326,10 +386,11 @@ var generateYears = function( residents, numWanted ) {
 	//	// console.log('-------------------Starting oneResult() while loop-------------------')
 	// 	// console.log('Time elapsed:', elapsed( oldTime ), ', loop number:', loopNumber);
 	// 	// // END DEBUGGING
-		
+
 		var result = oneResult( residents );
 		// console.log('----------Ending oneResult()------------')
 		// console.log( residents[0].name)
+
 	return result;
 };  // End generateYears()
 
@@ -341,6 +402,22 @@ var generateYears = function( residents, numWanted ) {
 // ===============================
 // POSSIBLE INDIVIDUAL SCHEDULES
 // ===============================
+
+var dhTransform = function( sched, resident ) {
+// Replace Rural with Elec in all DH residents
+
+	if ( resident.dh_uh === 'dh' ) {
+
+		var index = sched.indexOf(2);
+
+		if (index !== -1) {  // Don't think we need this check, but meh
+		    sched[index] = 3;
+		}
+
+	}
+
+	return sched;
+};  // End dhTransform
 
 var mustExterminate = function( sched, unwanted ) {
 /*
@@ -414,11 +491,14 @@ specifically not desired
 			// and doesn't contain slots the resident has rejected
 			var reject = mustExterminate( sched, unwanted );
 			if ( !reject ) {
+				// Not sure it fits here, but don't want to loop through again
+				// Replace Rural with Elec in all DH residents
+				sched = dhTransform( sched, resident );
 				// add it to the list of their possible schedules
 				actual.push( sched );
 			}
 		}
-	}
+	}  // end for every possible schedule
 
 	return actual;
 };  // End customLimiters()
@@ -538,25 +618,24 @@ var cancel = function() {
 // =============================
 // DO IT! (ESTABLISH RESIDENTS, FORMAT RESULTS)
 // =============================
-var generate = function( resids, numWanted ) {
+var cardioDermLimit;
+var generate = function( resids, includeLimit ) {
 // This is all with a specific set of input for the program
 // If we get different input, all bets are off, though maybe
 // we should save the results we got from the old inputs
 // console.log('----- generating from:', resids);
 	residents = resids;
+	cardioDermLimit = includeLimit;
 
 	// Assign all possible schedules to each resident
 	for ( var resi = 0; resi < residents.length; resi++ ) {//residents.length; resi++ ) {
 		// Start with a seed resident
 		var resident = residents[ resi ];
-// if (resident.name === 'Roxi') { console.log('************', resident.name, ':', resident.vacationMonths)}
 
 		// Get their list of possible schedules using their vacation months
 		var possible 	  = vacationLimitation( resident.vacationMonths );
 		possible 		  = addVacations( resident, possible );
 		resident.possible = customLimiters( resident, possible );
-
-// if(resident.name === 'Roxi') { var copy = resident.possible.slice(); fs.writeFile( 'temp.json', JSON.stringify(copy) );}
 
 		// If this is the case, something has gone wrong earlier on.
 		// Try to figure it out and tell the person running the program
@@ -584,7 +663,8 @@ var generate = function( resids, numWanted ) {
 	// return simplified;
 };  // End getOptions()
 
-// var oneOption = generate(constraints.residents, 1)
+
+// var oneOption = generate(constraints.residents, false)
 // console.log(oneOption[0].selected);
 
 

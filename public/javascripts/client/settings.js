@@ -104,7 +104,7 @@ var Settings = function() {
 
 		// - Rejections/Exclusions -
 		// http://stackoverflow.com/questions/786142/how-to-retrieve-checkboxes-values-in-jquery
-		var $rejects = $($cell.find('input[name=rot_reject]:checked')),
+		var $rejects = $cell.find('input[name=rot_reject]:checked'),
 			rejects  = [];
 		$rejects.each(function() {
 			rejects.push($(this).val());
@@ -133,9 +133,6 @@ var Settings = function() {
 		var $header = $($row.find('th')[0]);
 		res.name 	= $($header.find('input[name=res_name]')).val();
 		res.locked 	= $($header.find('.locker')).hasClass('fa-lock');
-		if ( res.locked ) {
-			console.log( 'locked:', res.name );
-		}
 
 		var dhuhName = res.name.replace(/\W+/g, "_") + '_dh_uh';
 		res.dh_uh 	= $($header.find('input[name=' + dhuhName + ']:checked')).val();
@@ -347,7 +344,6 @@ var Settings = function() {
 		for ( var seli = 0; seli < selected.length; seli++ ) {
 			if ( seli === monthi ) {
 				var selection = selected[ seli ];
-				// console.log(selected, selection, rotationNames, rotationNames[selection])
 				choice = rotationNames[selection];
 			}
 		}  // End for each pre-selected, but not locked
@@ -668,13 +664,6 @@ var Settings = function() {
 		// Will return before synchronous stuff is done I guess
 		return residents;
 	};  // End settings.load()
-
-
-	// settings.build = function( tbody, residents ) {
-
-	// 	settings.getRow()
-
-	// }
 
 
 	return settings;

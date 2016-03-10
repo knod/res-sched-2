@@ -41,7 +41,5 @@ var generate = require('../server/generate.js')
 // Result should be: [[8,7,6,5,4,2,1,3,1,1,3,1], [8,7,6,5,4,2,1,3,1,3,1,1]]
 
 // Whole thing
-var result = generate(residents, 1)
-// console.log('tryOne() ran', tryingOne, 'times')
-// console.log('tooMany() ran', countTooMany, 'times');
-console.log( JSON.stringify(result) );
+var result = generate(residents, false)
+console.log( result[0].selected );

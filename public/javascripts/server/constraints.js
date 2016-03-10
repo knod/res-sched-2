@@ -8,9 +8,9 @@ var residents = [
 	// each working schedule should be kept with final results
 	{
 		name: 'Roxi', dh_uh: 'dh', locked: true,
-		vacationMonths: ['Jan', 'Feb', 'Apr'], extraVacationMonths: [],
-		requested: [{month: 'Jan', rotation: 'Elec'}, {month: 'Mar', rotation: 'FMS'}],
-		rejected: [{month: 'Apr', rotations: ['Derm', 'Ger']}],
+		vacationMonths: [], extraVacationMonths: [],
+		requested: [],
+		rejected: [],
 		possible: [],//, schedule: []
 		lockedMonths: [],
 		selected: []  // there will be repeats from requested
@@ -21,7 +21,7 @@ var residents = [
 		requested: [/*{month:'Aug', rotation:'Rural'}*/],
 		rejected: [/*{month:'Aug', rotations: ['FMS','Elec']}*/],
 		possible: [],//, schedule: []
-		lockedMonths: ['Jul'],
+		lockedMonths: [],
 		selected: []  // there will be repeats from requested
 	},
 	{
@@ -36,7 +36,7 @@ var residents = [
 	{
 		name: 'Hayley', dh_uh: 'dh', locked: false,
 		vacationMonths: [], extraVacationMonths: [],
-		requested: [ {month: 'Jul', rotation: 'Elec'} ],
+		requested: [ /*{month: 'Jul', rotation: 'Elec'}*/ ],
 		rejected: [],
 		possible: [],//, schedule: []
 		lockedMonths: [],
@@ -45,7 +45,7 @@ var residents = [
 	{
 		name: 'Beka', dh_uh: 'uh', locked: false,
 		vacationMonths: [], extraVacationMonths: [],
-		requested: [ {month: 'Aug', rotation: 'W-P'} ],
+		requested: [ /*{month: 'Aug', rotation: 'W-P'}*/ ],
 		rejected: [],
 		possible: [],//, schedule: []
 		lockedMonths: [],
@@ -54,7 +54,7 @@ var residents = [
 	{
 		name: 'Ali', dh_uh: 'uh', locked: false,
 		vacationMonths: [], extraVacationMonths: [],
-		requested: [ {month: 'Jul', rotation: 'Elec'} ],
+		requested: [ /*{month: 'Jul', rotation: 'Elec'}*/ ],
 		rejected: [],
 		possible: [],//, schedule: []
 		lockedMonths: [],
@@ -90,11 +90,12 @@ var residents = [
 	{
 		name: 'Kelly', dh_uh: 'uh', locked: false,
 		vacationMonths: [], extraVacationMonths: [],
-		requested: [ {month: 'Aug', rotation: 'W-P'} ],
+		requested: [ /*{month: 'Aug', rotation: 'W-P'}*/ ],
 		rejected: [],
 		possible: [],//, schedule: []
 		lockedMonths: [],
 		selected: []  // there will be repeats from requested
+		, last: true
 	}
 ];
 
@@ -138,8 +139,8 @@ var rotations = [
 	{  // 1 FMS + AFM
 		name: 'FMS',
 		perMonth: [ {min: 4, max: 4}, {min: 4, max: 4}, {min: 4, max: 4},
-			{min: 4, max: 4}, {min: 4, max: 4}, {min: 2, max: 2},
-			{min: 3, max: 3}, {min: 3, max: 3}, {min: 3, max: 3},
+			{min: 4, max: 4}, {min: 3, max: 3}, {min: 2, max: 2},
+			{min: 4, max: 4}, {min: 3, max: 3}, {min: 3, max: 3},
 			{min: 3, max: 3}, {min: 3, max: 3}, {min: 3, max: 3}
 		],
 		resTypes: [ 'dh', 'uh' ],
@@ -148,11 +149,11 @@ var rotations = [
 		vacation: false
 	},
 	{  // 2
-		name: 'Rural',  // Maybe 0 to 1
-		perMonth: [ {min: 0, max: numR}, {min: 0, max: numR}, {min: 0, max: numR},
-			{min: 0, max: numR}, {min: 0, max: numR}, {min: 0, max: numR},
-			{min: 0, max: numR}, {min: 0, max: numR}, {min: 0, max: numR},
-			{min: 0, max: numR}, {min: 0, max: numR}, {min: 0, max: numR}
+		name: 'Rural',  // Matches minus FMS
+		perMonth: [ {min: 0, max: numR - 4}, {min: 0, max: numR - 4}, {min: 0, max: numR - 4},
+			{min: 0, max: numR - 4}, {min: 0, max: numR - 3}, {min: 0, max: numR - 2},
+			{min: 0, max: numR - 4}, {min: 0, max: numR - 3}, {min: 0, max: numR - 3},
+			{min: 0, max: numR - 3}, {min: 0, max: numR - 3}, {min: 0, max: numR - 3}
 		],
 		resTypes: [ 'uh' ],
 		perResident: {'dh': 0, 'uh': 1},
@@ -160,11 +161,11 @@ var rotations = [
 		vacation: false
 	},
 	{  // 3
-		name: 'Elec',
-		perMonth: [ {min: 0, max: numR}, {min: 0, max: numR}, {min: 0, max: numR},
-			{min: 0, max: numR}, {min: 0, max: numR}, {min: 0, max: numR},
-			{min: 0, max: numR}, {min: 0, max: numR}, {min: 0, max: numR},
-			{min: 0, max: numR}, {min: 0, max: numR}, {min: 0, max: numR}
+		name: 'Elec',  // Matches minus FMS
+		perMonth: [ {min: 0, max: numR - 4}, {min: 0, max: numR - 4}, {min: 0, max: numR - 4},
+			{min: 0, max: numR - 4}, {min: 0, max: numR - 3}, {min: 0, max: numR - 2},
+			{min: 0, max: numR - 4}, {min: 0, max: numR - 3}, {min: 0, max: numR - 3},
+			{min: 0, max: numR - 3}, {min: 0, max: numR - 3}, {min: 0, max: numR - 3}
 		],
 		resTypes: [ 'dh', 'uh' ],
 		perResident: {'dh': 3, 'uh': 2},
@@ -260,7 +261,7 @@ var requirementTracker = [
 
 var maxes = [
 	[],  // Rotation numbers start with 1, so 0 is a placeholder
-	[4, 4, 4, 4, 4, 2, 3, 3, 3, 3, 3, 3],  // 1, FMS
+	[4, 4, 4, 4, 3, 2, 4, 3, 3, 3, 3, 3],  // 1, FMS
 	[9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9],  // 2, Rural (actually 10)
 	[9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9],  // 3, Elective (actually 10)
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],  // 4, Cardiology

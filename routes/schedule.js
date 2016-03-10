@@ -5,7 +5,7 @@
 'use strict' ;
 
 var schedModel 	= require('../models/schedule.js');
-var generate 	= require('../public/javascripts/server/generate.js');
+var generator 	= require('../public/javascripts/server/generate.js');
 
 
 var schedRouter = require('express').Router();
@@ -52,10 +52,10 @@ schedRouter.put( '/generate', function onPUTRequest( request, response, next ) {
 // generate new data for the schedule and send it back
 	console.log('generating object to be displayed on page');//:', request.body);
 
-	var residents = request.body;//JSON.parse(request.body).residents;
-	console.log('in .put(). Sent data:', residents[0]);
+	var residents 	= request.body.residents,
+		limiter 	= request.body.limiter;
 	// As long as generate runs synchronously
-	var generated = generate.generate( residents );
+	var generated = generator.generate( residents, limiter );
 
 	response.status( 200 );  // Can use this to show visually that it's been processed
 	response.json( generated );

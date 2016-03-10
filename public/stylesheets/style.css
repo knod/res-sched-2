@@ -281,12 +281,17 @@ border:1px solid #F1988E; -webkit-border-radius: 2px; -moz-border-radius: 2px;bo
 	position: absolute;
 	left: 50%;
 	top: 0;
-	transform: translate(-50%, 0);
+	transform: translate(-50%, 100%);
 	width: 15%;
 	height: auto;
-	display: none;
 
 	z-index: 200;
+}
+.ghost {
+	display: none;
+}
+.hidden {
+	visibility: hidden;
 }
 
 .locked {
@@ -300,7 +305,7 @@ border:1px solid #F1988E; -webkit-border-radius: 2px; -moz-border-radius: 2px;bo
 	border-color: rgb(200, 200, 200);
 }
 .locked .de-color.arrow-right {
-	border-left-color: rgb(120, 120, 120);
+	border-left-color: rgb(140, 140, 140);
 }
 
 /* FOR CLARITY FOR NOW, THEIRS STARTS IN JULY */
