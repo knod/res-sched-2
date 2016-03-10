@@ -31,9 +31,7 @@ var combosFile 	= fs.readFileSync(__dirname + '/../data/combos.json');
 var combosArr 	= JSON.parse(combosFile);
 
 // Path to where combo data by vacation month is kept, in format for fs.readFile()
-var monthsDir 	= '../../../../../../Comfadorable/Dropbox/ResSchedule';  // For server call
-// Path to where combo data by vacation month is kept, in format for fs.readFile()
-var monthsDir 	= '../../../../../../../../../Users/Comfadorable/Dropbox/ResSchedule';  // For local call
+var monthsDir 	= '../data/by-month';  // For local call
 // console.log('--------- directory:', fs.readdirSync('../../../../../../../../../Users/Comfadorable/Dropbox')); //+ '/../res-sched-app/'));// + '/../javascripts'));
 
 // var residents 	= [constraints.residents[0], constraints.residents[1]],

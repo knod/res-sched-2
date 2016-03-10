@@ -1,4 +1,4 @@
-// generator-tests.js
+// public/javascripts/tests/generator-tests.js
 
 var residents = require('../server/constraints.js').residents;
 var generate = require('../server/generate.js')
@@ -41,5 +41,5 @@ var generate = require('../server/generate.js')
 // Result should be: [[8,7,6,5,4,2,1,3,1,1,3,1], [8,7,6,5,4,2,1,3,1,3,1,1]]
 
 // Whole thing
-var result = generate(residents, false)
+var result = generate.generate(residents, false)
 console.log( result[0].selected );
