@@ -332,44 +332,45 @@ var Settings = function() {
 			$($cell.find('input[name=vacation]')[0]).prop('checked', true);
 		}
 
-		// // - REQUESTED -
-		// // Give this set of radio groups a unique name
-		// var sanitzd = resident.name.replace(/\W+/g, "_"),
-		// 	reqID 	= sanitzd + '_' + month + '_rot_request';
-		// $cell.find('input[name=rot_request]').prop('name', reqID);
+		// - REQUESTED -
+		// Give this set of radio groups a unique name
+		var sanitzd = resident.name.replace(/\W+/g, "_"),
+			reqID 	= sanitzd + '_' + month + '_rot_request';
+		$cell.find('input[name=rot_request]').prop('name', reqID);
 
-		// // - GENTERATED -
-		// var selected = resident.selected,
-		// 	choice 	 = 'None';
-		// for ( var seli = 0; seli < selected.length; seli++ ) {
-		// 	if ( seli === monthi ) {
-		// 		var selection = selected[ seli ];
-		// 		choice = rotationNames[selection];
-		// 	}
-		// }  // End for each pre-selected, but not locked
+		// ---- newly activated
+		// - GENTERATED -
+		var selected = resident.selected,
+			choice 	 = 'None';
+		for ( var seli = 0; seli < selected.length; seli++ ) {
+			if ( seli === monthi ) {
+				var selection = selected[ seli ];
+				choice = rotationNames[selection];
+			}
+		}  // End for each pre-selected, but not locked
 
-		// // Update radio button selection and cell text
-		// var $choice = $cell.find('.request-choice.' + choice ).eq(0);
-		// $choice.find( 'input' ).eq(0).prop('checked', true);
-		// var $name = $cell.find('.rot-output').eq(0);
-		// $name.text( choice );
+		// Update radio button selection and cell text
+		var $choice = $cell.find('.request-choice.' + choice ).eq(0);
+		$choice.find( 'input' ).eq(0).prop('checked', true);
+		var $name = $cell.find('.rot-output').eq(0);
+		$name.text( choice );
 
 
-		// // - REJECTED -
-		// var rejected = resident.rejected;
-		// for ( var reji = 0; reji < rejected.length; reji++ ) {
+		// - REJECTED -
+		var rejected = resident.rejected;
+		for ( var reji = 0; reji < rejected.length; reji++ ) {
 
-		// 	var reject = rejected[ reji ];
-		// 	if ( month === reject.month ) {
+			var reject = rejected[ reji ];
+			if ( month === reject.month ) {
 
-		// 		var rotations = reject.rotations
-		// 		for ( var roti = 0; roti < rotations.length; roti++ ) {
-		// 			var rotation = rotations[ roti ];
-		// 			var $choice = $($cell.find('.reject-choice.' + rotation )[0]);
-		// 			$($choice.find('input')[0]).prop('checked', true);
-		// 		}
-		// 	}  // end for every rotation in a rejection
-		// }  // end for every rejection
+				var rotations = reject.rotations
+				for ( var roti = 0; roti < rotations.length; roti++ ) {
+					var rotation = rotations[ roti ];
+					var $choice = $($cell.find('.reject-choice.' + rotation )[0]);
+					$($choice.find('input')[0]).prop('checked', true);
+				}
+			}  // end for every rotation in a rejection
+		}  // end for every rejection
 
 		// // - LOCKING -
 		// var lockedMonths = resident.lockedMonths,
@@ -451,7 +452,6 @@ var Settings = function() {
 			$td.attr('data-month', month);
 			// console.log($td.prop('data-month'))  // still not working
 
-			// ---- newly activated
 			buildCell( $td, month, resident, true )
 		}
 
