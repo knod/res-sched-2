@@ -19,7 +19,7 @@
 	<h1>Schedule</h1>
 	
 	<button class='generate' name='generate'>Generate New</button>
-	<!-- <button name='cancel'>Cancel</button> -->
+	<button name='cancel'>Cancel</button>
 
 	<!-- <div class='generating-area'> -->
 		<img class='loading ghost' src='images/loading_icon.gif'></img>
@@ -49,6 +49,9 @@
 		</tbody>
 	</table>
 
+	<script src='javascripts/data/easy/combos.js'></script>
+	<script src='javascripts/client/Constraints.js'></script>
+	<script src='javascripts/client/Generator.js'></script>
 	<script src='javascripts/client/schedule.js'></script>
 	<script src='javascripts/client/settings.js'></script>
 	<script src='javascripts/client/page.js'></script>
@@ -61,15 +64,15 @@
 			{
 				name: 'Hayley', dh_uh: 'dh', locked: false,
 				vacationMonths: [], extraVacationMonths: [],
-				requested: [{month: 'Nov', rotation: 'Elec'}],
-				rejected: [{month: 'Jun', rotations: ['FMS']}],
+				requested: [],
+				rejected: [],
 				possible: [],//, schedule: []
 				lockedMonths: [],
 				selected: []  // there will be repeats from requested
 			},
 			{
 				name: 'Alex', dh_uh: 'uh', locked: false,
-				vacationMonths: [], extraVacationMonths: [],
+				vacationMonths: ['Mar', 'Dec'], extraVacationMonths: [],
 				requested: [],
 				rejected: [],
 				possible: [],//, schedule: []
@@ -78,7 +81,7 @@
 			},
 			{
 				name: 'Will', dh_uh: 'dh', locked: false,
-				vacationMonths: [], extraVacationMonths: [],
+				vacationMonths: ['Jun'], extraVacationMonths: [],
 				requested: [],
 				rejected: [
 				],
@@ -98,7 +101,7 @@
 			},
 			{
 				name: 'Emily', dh_uh: 'uh', locked: false,
-				vacationMonths: [], extraVacationMonths: [],
+				vacationMonths: ['Jan', 'Apr'], extraVacationMonths: [],
 				requested: [],
 				rejected: [],
 				possible: [],//, schedule: []
@@ -117,7 +120,7 @@
 			{
 				name: 'Beka', dh_uh: 'uh', locked: false,
 				vacationMonths: ['Jul'], extraVacationMonths: [],
-				requested: [ {month: 'Aug', rotation: 'W-P'} ],
+				requested: [],
 				rejected: [],
 				possible: [],//, schedule: []
 				lockedMonths: [],
@@ -127,15 +130,15 @@
 				name: 'Kelly', dh_uh: 'uh', locked: false,
 				vacationMonths: ['Dec'], extraVacationMonths: [],
 				requested: [  ],
-				rejected: [ {month: 'Jul', rotations: ['FMS', 'Rural']} ],
+				rejected: [],
 				possible: [],//, schedule: []
 				lockedMonths: [],
 				selected: []  // there will be repeats from requested
 			},
 			{
 				name: 'Ali', dh_uh: 'uh', locked: false,
-				vacationMonths: ['Oct', 'Sep'], extraVacationMonths: [],
-				requested: [ {month: 'Jul', rotation: 'Elec'} ],
+				vacationMonths: ['Sep', 'Oct'], extraVacationMonths: [],
+				requested: [],
 				rejected: [],
 				possible: [],//, schedule: []
 				lockedMonths: [],

@@ -5,7 +5,7 @@
 'use strict' ;
 
 var schedModel 	= require('../models/schedule.js');
-var generator 	= require('../public/javascripts/server/generate.js');
+var getData 	= require('../public/javascripts/server/get-by-months.js');
 
 
 var schedRouter = require('express').Router();
@@ -15,7 +15,7 @@ module.exports 	= schedRouter;
 // LOADING SCHEDULE (Not used yet)
 schedRouter.get( '/sched', function onGETRequest( request, response, next ) {
 // If schedRouter gets a get request for '/' (user is loading),
-// get data about all keys and send it to the user
+// get data about the existing schedule (though I want multiple eventually)
 
 	schedModel.find( function (err, schedData) {
 		if (err) { next( err ) }
@@ -50,16 +50,28 @@ schedRouter.post( '/save', function onPOSTRequest( request, response, next ) {
 schedRouter.put( '/generate', function onPUTRequest( request, response, next ) {
 // If schedRouter gets a PUT (edit) request for '/' (user is editing),
 // generate new data for the schedule and send it back
-	console.log('generating object to be displayed on page');//:', request.body);
+	console.log('DEPRICATED: generating object on back end');//:', request.body);
 
-	var residents 	= request.body.residents,
-		limiter 	= request.body.limiter;
-	// As long as generate runs synchronously
-	var generated = generator.generate( residents, limiter );
+	// var residents 	= request.body.residents,
+	// 	limiter 	= request.body.limiter;
+	// // As long as generate runs synchronously
+	// var generated = generator.generate( residents, limiter );
 
-	response.status( 200 );  // Can use this to show visually that it's been processed
-	response.json( generated );
+	// response.status( 200 );  // Can use this to show visually that it's been processed
+	// response.json( generated );
 });  // End on put '/'
+
+
+// LOADING SCHEDULE (Not used yet)
+schedRouter.post( '/possible', function onGETRequest( request, response, next ) {
+// If schedRouter gets a get request for '/possible' (user is loading),
+// changes residents to residents with their possible schedule indexes
+
+	var resWithPossible = getData( request.body.residents );
+	response.status( 200 );
+	response.send( resWithPossible );
+
+});  // End on get '/'
 
 
 // STOPPING

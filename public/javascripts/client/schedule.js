@@ -16,6 +16,7 @@ var ScheduleHandler = function( settingsHandler ) {
 
 	var handler = {};
 
+	var generator = Generator();
 
 	handler.load = function( err, residents ) {
 	/* 
@@ -27,7 +28,8 @@ var ScheduleHandler = function( settingsHandler ) {
 		} else {
 			if ( residents !== null ) {
 				// Loading new settings
-				page.load( $('tbody')[0], residents );
+				var processed = generator.generate( residents, false );
+				page.load( $('tbody')[0], processed );
 			}
 		}
 
@@ -49,11 +51,11 @@ var ScheduleHandler = function( settingsHandler ) {
 		// Asynchronous $.ajax
 		$.ajax({
 			// ??!!: Is this right?
-			url: '/generate/',// + newObj._id,  // Stuff in start of app.js (app.use('/x', require('./routes/x') );) & mongo's _id for objects
-			method: 'PUT',  // Basically 'edit'
+			url: '/possible',// + newObj._id,  // Stuff in start of app.js (app.use('/x', require('./routes/x') );) & mongo's _id for objects
+			method: 'POST',  // Basically 'edit'
 			dataType: 'json',
 			contentType: 'application/json',
-			data: JSON.stringify( {residents: residents, limiter: false} )
+			data: JSON.stringify( {residents: residents} )
 		})  // End $.ajax() (sort of)
 		.then( function successHandler( residentData, responseText ) {
 		// Only fires on a successful request. If this gets run, we've actually saved
@@ -63,18 +65,19 @@ var ScheduleHandler = function( settingsHandler ) {
 			// console.log('generated:', residentData);
 			handler.load( null, residentData );  // ??: Does this have a ._id?
 
-			// Hide loading visuals
-			$('.loading').addClass('ghost');
-			$('table').removeClass('hidden');
-			$('.generate').removeClass('hidden');
+			// // Hide loading visuals
+			// $('.loading').addClass('ghost');
+			// $('table').removeClass('hidden');
+			// $('.generate').removeClass('hidden');
 
 		}, function errHandler( err ) {
 			console.error( 'tried to generate:', err );
 			handler.load( err, null );
 
-			// Hide loading visuals
-			$('.loading').addClass('ghost');
-			$('table').removeClass('hidden');
+			// // Hide loading visuals
+			// $('.loading').addClass('ghost');
+			// $('table').removeClass('hidden');
+			// $('.generate').removeClass('hidden');
 		});  // End .then(), which ends $.ajax()
 
 	};  // End handler.generate()
@@ -87,21 +90,24 @@ var ScheduleHandler = function( settingsHandler ) {
 
 
 	handler.cancel = function() {
-		// Asynchronous $.ajax
-		$.ajax({
-			// ??!!: Is this right?
-			url: '/cancel',// + newObj._id,  // Stuff in start of app.js (app.use('/x', require('./routes/x') );) & mongo's _id for objects
-			method: 'PUT',  // Basically 'edit'
-			data: 'cancel'
-		})  // End $.ajax() (sort of)
-		.then( function successHandler( residentData, responseText ) {
-		// Only fires on a successful request. If this gets run, we've actually saved
-		// responseText should be the string 'created'
-			if ( responseText === 'No Content' ) { console.log('response was "No Content"'); }
+		// // Asynchronous $.ajax
+		// $.ajax({
+		// 	// ??!!: Is this right?
+		// 	url: '/cancel',// + newObj._id,  // Stuff in start of app.js (app.use('/x', require('./routes/x') );) & mongo's _id for objects
+		// 	method: 'PUT',  // Basically 'edit'
+		// 	data: 'cancel'
+		// })  // End $.ajax() (sort of)
+		// .then( function successHandler( residentData, responseText ) {
+		// // Only fires on a successful request. If this gets run, we've actually saved
+		// // responseText should be the string 'created'
+		// 	if ( responseText === 'No Content' ) { console.log('response was "No Content"'); }
 
-		}, function errHandler( err ) {
-			console.error( 'tried canceling:', err );
-		});  // End .then(), which ends $.ajax()
+		// }, function errHandler( err ) {
+		// 	console.error( 'tried canceling:', err );
+		// });  // End .then(), which ends $.ajax()
+
+		generator.cancel();
+
 	};  // End handler.cancel()
 
 

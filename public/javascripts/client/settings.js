@@ -60,9 +60,8 @@ var Settings = function() {
 	* 	selected: []
 	*}; 
 	*/
-		var month 		= $cell.data('month'),
-			sanitzd 	= res.name.replace(/\W+/g, "_"),
-			requestID 	= sanitzd + '_' + month + '_rot_request';
+		var month 	= $cell.data('month'),
+			sanitzd = res.name.replace(/\W+/g, "_");
 
 		// - Vacations -
 		var isVac = $($cell.find('input[name=vacation]:checked')).length > 0;
@@ -85,6 +84,7 @@ var Settings = function() {
 			res.lockedMonths.push( month );
 		}
 
+		var requestID = sanitzd + '_' + month + '_rot_request';
 		// - Requested -
 		// if res.locked, get all of them
 		if ( locked === true || res.locked === true ) {
@@ -99,7 +99,7 @@ var Settings = function() {
 		}
 
 		// - Selected/Generated -
-		var $generated = $cell.find('input[name=rot_request]:checked').eq(0);
+		var $generated = $cell.find('input[name=' + requestID + ']:checked').eq(0);
 		res.selected.push( {month: month, rotation: $generated.val()} )
 
 		// - Rejections/Exclusions -
@@ -110,7 +110,9 @@ var Settings = function() {
 			rejects.push($(this).val());
 		});
 
-		res.rejected.push({ month: month, rotations: rejects });
+		if ( rejects.length > 0 ) {
+			res.rejected.push({ month: month, rotations: rejects });
+		}
 
 		return res;
 	};  // End saveByCell()
