@@ -509,17 +509,17 @@ var Settings = function() {
 			// Use jade to load template, then alter it from there
 			for ( var resi = 0; resi < residents.length; resi++ ) {
 
-				// var resident = residents[ resi ];
-				// var $trNode = $(tr);
+				var resident = residents[ resi ];
+				var $trNode = $(tr);
 
-				// $tbody.append( $trNode );
+				$tbody.append( $trNode );
 
-				// // Not sure what my stuff looks like now, so I'm just going to
-				// // start fresh with the node I know I have
-				// var id = resident.name.replace(/\W+/g, "_");
-				// $trNode.attr('id', 'tr_' + id);
+				// Not sure what my stuff looks like now, so I'm just going to
+				// start fresh with the node I know I have
+				var id = resident.name.replace(/\W+/g, "_");
+				$trNode.attr('id', 'tr_' + id);
 
-				// buildRowHeader( $trNode, resident );
+				buildRowHeader( $trNode, resident );
 				// buildCells( $trNode, td, resident );
 				// // Lock all if necessary
 				// lockIf( $trNode, resident );
