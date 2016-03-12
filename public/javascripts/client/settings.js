@@ -428,9 +428,7 @@ var Settings = function() {
 
 				$cell.find('.rot-output').eq(0).text( $(this).val() );
 				toggleMonthLock( evnt, $locker, resident, month);
-
 			})
-
 		}
 
 		return $cell;
