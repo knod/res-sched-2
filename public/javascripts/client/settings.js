@@ -412,7 +412,6 @@ var Settings = function() {
 			}
 		}
 
-		// ---- newly activated
 		// EVENTS
 		// If it's the first time making this element,
 		// make user able to lock the month
@@ -423,13 +422,14 @@ var Settings = function() {
 				toggleMonthLock( evnt, $locker, resident, month );
 			});  // lock and unlock month
 
-		// 	var $reqChoices = $cell.find('input[name=' + reqID + ']');
-		// 	$reqChoices.click( function choiceClicked( evnt ) {
+			// ---- newly activated
+			var $reqChoices = $cell.find('input[name=' + reqID + ']');
+			$reqChoices.click( function choiceClicked( evnt ) {
 
-		// 		$cell.find('.rot-output').eq(0).text( $(this).val() );
-		// 		toggleMonthLock( evnt, $locker, resident, month);
+				$cell.find('.rot-output').eq(0).text( $(this).val() );
+				toggleMonthLock( evnt, $locker, resident, month);
 
-		// 	})
+			})
 
 		}
 
