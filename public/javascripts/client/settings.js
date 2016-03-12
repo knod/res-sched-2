@@ -451,7 +451,7 @@ var Settings = function() {
 			$td.attr('data-month', month);
 			// console.log($td.prop('data-month'))  // still not working
 
-			buildCell( $td, month, resident, true )
+			// buildCell( $td, month, resident, true )
 		}
 
 		return $tr;
@@ -520,9 +520,10 @@ var Settings = function() {
 				$trNode.attr('id', 'tr_' + id);
 
 				buildRowHeader( $trNode, resident );
-				// buildCells( $trNode, td, resident );
-				// // Lock all if necessary
-				// lockIf( $trNode, resident );
+				// ---- newly activated
+				buildCells( $trNode, td, resident );
+				// Lock all if necessary
+				lockIf( $trNode, resident );
 
 			}  // end for every table row
 
