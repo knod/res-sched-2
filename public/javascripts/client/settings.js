@@ -499,64 +499,64 @@ var Settings = function() {
 	* 
 	* 
 	*/
-		// if ( err ) {
-		// 	console.error('get tr and td templates errored:', err );
-		// } else {
-		// 	// console.log('got tr and td templates template:', tr, td);
+		if ( err ) {
+			console.error('get tr and td templates errored:', err );
+		} else {
+			// console.log('got tr and td templates template:', tr, td);
 
-		// 	var $tbody  = $(tbody);
+			var $tbody  = $(tbody);
 
-		// 	// Use jade to load template, then alter it from there
-		// 	for ( var resi = 0; resi < residents.length; resi++ ) {
+			// Use jade to load template, then alter it from there
+			for ( var resi = 0; resi < residents.length; resi++ ) {
 
-		// 		var resident = residents[ resi ];
-		// 		var $trNode = $(tr);
+				// var resident = residents[ resi ];
+				// var $trNode = $(tr);
 
-		// 		$tbody.append( $trNode );
+				// $tbody.append( $trNode );
 
-		// 		// Not sure what my stuff looks like now, so I'm just going to
-		// 		// start fresh with the node I know I have
-		// 		var id = resident.name.replace(/\W+/g, "_");
-		// 		$trNode.attr('id', 'tr_' + id);
+				// // Not sure what my stuff looks like now, so I'm just going to
+				// // start fresh with the node I know I have
+				// var id = resident.name.replace(/\W+/g, "_");
+				// $trNode.attr('id', 'tr_' + id);
 
-		// 		buildRowHeader( $trNode, resident );
-		// 		buildCells( $trNode, td, resident );
-		// 		// Lock all if necessary
-		// 		lockIf( $trNode, resident );
+				// buildRowHeader( $trNode, resident );
+				// buildCells( $trNode, td, resident );
+				// // Lock all if necessary
+				// lockIf( $trNode, resident );
 
-		// 	}  // end for every table row
+			}  // end for every table row
 
-		// 	// console.log($tbody.find('input'))
-		// 	$tbody.find('input').change(function(evnt) {
-		// 		page.update( $('.jade-views')[0] );
-		// 	});
+			// console.log($tbody.find('input'))
+			$tbody.find('input').change(function(evnt) {
+				page.update( $('.jade-views')[0] );
+			});
 
-		// 	$tbody.find('input').on('input', function(evnt) {
-		// 		page.update( $('.jade-views')[0] );
-		// 	});
+			$tbody.find('input').on('input', function(evnt) {
+				page.update( $('.jade-views')[0] );
+			});
 
-		// 	var generate = function() {
-		// 		var residents = page.update( $('tbody')[0] );
-		// 		// console.log('generating from settings.:', settings.residents[0].vacationMonths)
-		// 		// console.log('generating from new residents:', residents[8].dh_uh)
-		// 		schedHandler.generate( residents );  // Why does this work
-		// 		// schedHandler.generate( settings.residents );  // When this one doesn't?
-		// 	}
+			var generate = function() {
+				var residents = page.update( $('tbody')[0] );
+				// console.log('generating from settings.:', settings.residents[0].vacationMonths)
+				// console.log('generating from new residents:', residents[8].dh_uh)
+				schedHandler.generate( residents );  // Why does this work
+				// schedHandler.generate( settings.residents );  // When this one doesn't?
+			}
 
-		// 	if (!haveDoneThis) {
-		// 		haveDoneThis = true;
+			if (!haveDoneThis) {
+				haveDoneThis = true;
 
-		// 		$('button[name=generate]').click( generate );
+				$('button[name=generate]').click( generate );
 
-		// 		$('button[name=cancel]').click(function cancel() {
-		// 			schedHandler.cancel();
-		// 		});
-		// 	}
+				$('button[name=cancel]').click(function cancel() {
+					schedHandler.cancel();
+				});
+			}
 
-		// 	var page = Page();
-		// 	page.update( $tbody[0] )
-		// 	csvSchedToJSON( residents );
-		// }  // end if/if not err
+			var page = Page();
+			page.update( $tbody[0] )
+			csvSchedToJSON( residents );
+		}  // end if/if not err
 
 		// Don't pretend to return something for asynchronous call
 	};  // End settings.buildRows() (callback)
