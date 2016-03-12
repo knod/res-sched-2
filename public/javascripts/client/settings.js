@@ -371,7 +371,6 @@ var Settings = function() {
 			}  // end for every rotation in a rejection
 		}  // end for every rejection
 
-		// ---- newly activated
 		// - LOCKING -
 		var lockedMonths = resident.lockedMonths,
 			$input 		 = $cell.find('input'),
@@ -413,15 +412,16 @@ var Settings = function() {
 			}
 		}
 
-		// // EVENTS
-		// // If it's the first time making this element,
-		// // make user able to lock the month
-		// if (!fromBuildCells) {
+		// ---- newly activated
+		// EVENTS
+		// If it's the first time making this element,
+		// make user able to lock the month
+		if (!fromBuildCells) {
 
-		// 	var $locker = $cell.find('.locker').eq(0);
-		// 	$locker.click(function lockClicked( evnt ) {
-		// 		toggleMonthLock( evnt, $locker, resident, month );
-		// 	});  // lock and unlock month
+			var $locker = $cell.find('.locker').eq(0);
+			$locker.click(function lockClicked( evnt ) {
+				toggleMonthLock( evnt, $locker, resident, month );
+			});  // lock and unlock month
 
 		// 	var $reqChoices = $cell.find('input[name=' + reqID + ']');
 		// 	$reqChoices.click( function choiceClicked( evnt ) {
@@ -431,7 +431,7 @@ var Settings = function() {
 
 		// 	})
 
-		// }
+		}
 
 		return $cell;
 	};  // End buildCell()
