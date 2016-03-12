@@ -332,105 +332,105 @@ var Settings = function() {
 			$($cell.find('input[name=vacation]')[0]).prop('checked', true);
 		}
 
-		// - REQUESTED -
-		// Give this set of radio groups a unique name
-		var sanitzd = resident.name.replace(/\W+/g, "_"),
-			reqID 	= sanitzd + '_' + month + '_rot_request';
-		$cell.find('input[name=rot_request]').prop('name', reqID);
+		// // - REQUESTED -
+		// // Give this set of radio groups a unique name
+		// var sanitzd = resident.name.replace(/\W+/g, "_"),
+		// 	reqID 	= sanitzd + '_' + month + '_rot_request';
+		// $cell.find('input[name=rot_request]').prop('name', reqID);
 
-		// - GENTERATED -
-		var selected = resident.selected,
-			choice 	 = 'None';
-		for ( var seli = 0; seli < selected.length; seli++ ) {
-			if ( seli === monthi ) {
-				var selection = selected[ seli ];
-				choice = rotationNames[selection];
-			}
-		}  // End for each pre-selected, but not locked
+		// // - GENTERATED -
+		// var selected = resident.selected,
+		// 	choice 	 = 'None';
+		// for ( var seli = 0; seli < selected.length; seli++ ) {
+		// 	if ( seli === monthi ) {
+		// 		var selection = selected[ seli ];
+		// 		choice = rotationNames[selection];
+		// 	}
+		// }  // End for each pre-selected, but not locked
 
-		// Update radio button selection and cell text
-		var $choice = $cell.find('.request-choice.' + choice ).eq(0);
-		$choice.find( 'input' ).eq(0).prop('checked', true);
-		var $name = $cell.find('.rot-output').eq(0);
-		$name.text( choice );
+		// // Update radio button selection and cell text
+		// var $choice = $cell.find('.request-choice.' + choice ).eq(0);
+		// $choice.find( 'input' ).eq(0).prop('checked', true);
+		// var $name = $cell.find('.rot-output').eq(0);
+		// $name.text( choice );
 
 
-		// - REJECTED -
-		var rejected = resident.rejected;
-		for ( var reji = 0; reji < rejected.length; reji++ ) {
+		// // - REJECTED -
+		// var rejected = resident.rejected;
+		// for ( var reji = 0; reji < rejected.length; reji++ ) {
 
-			var reject = rejected[ reji ];
-			if ( month === reject.month ) {
+		// 	var reject = rejected[ reji ];
+		// 	if ( month === reject.month ) {
 
-				var rotations = reject.rotations
-				for ( var roti = 0; roti < rotations.length; roti++ ) {
-					var rotation = rotations[ roti ];
-					var $choice = $($cell.find('.reject-choice.' + rotation )[0]);
-					$($choice.find('input')[0]).prop('checked', true);
-				}
-			}  // end for every rotation in a rejection
-		}  // end for every rejection
+		// 		var rotations = reject.rotations
+		// 		for ( var roti = 0; roti < rotations.length; roti++ ) {
+		// 			var rotation = rotations[ roti ];
+		// 			var $choice = $($cell.find('.reject-choice.' + rotation )[0]);
+		// 			$($choice.find('input')[0]).prop('checked', true);
+		// 		}
+		// 	}  // end for every rotation in a rejection
+		// }  // end for every rejection
 
-		// - LOCKING -
-		var lockedMonths = resident.lockedMonths,
-			$input 		 = $cell.find('input'),
-			$locker 	 = $cell.find('.locker').eq(0);
-		if ( lockedMonths.indexOf(month) > -1 ) {
-			$input.prop('disabled', true);
+		// // - LOCKING -
+		// var lockedMonths = resident.lockedMonths,
+		// 	$input 		 = $cell.find('input'),
+		// 	$locker 	 = $cell.find('.locker').eq(0);
+		// if ( lockedMonths.indexOf(month) > -1 ) {
+		// 	$input.prop('disabled', true);
 
-			$locker.removeClass('fa-unlock');
-			$locker.addClass('fa-lock');
-			$cell.addClass('locked');
-		} else {
-			$input.prop('disabled', false)
+		// 	$locker.removeClass('fa-unlock');
+		// 	$locker.addClass('fa-lock');
+		// 	$cell.addClass('locked');
+		// } else {
+		// 	$input.prop('disabled', false)
 
-			$locker.removeClass('fa-lock');
-			$locker.addClass('fa-unlock');
-			$cell.removeClass('locked');
-		}
+		// 	$locker.removeClass('fa-lock');
+		// 	$locker.addClass('fa-unlock');
+		// 	$cell.removeClass('locked');
+		// }
 
-		// Lock a month if it's requested
-		var requested = resident.requested;
-		for ( var reqi = 0; reqi < requested.length; reqi++ ) {
-			var request = requested[ reqi ]
+		// // Lock a month if it's requested
+		// var requested = resident.requested;
+		// for ( var reqi = 0; reqi < requested.length; reqi++ ) {
+		// 	var request = requested[ reqi ]
 
-			if ( request.month === month ) {
+		// 	if ( request.month === month ) {
 
-				var rot = request.rotation;
-				// Update radio button selection and cell text
-				var $choice = $cell.find('.request-choice.' + rot ).eq(0);
-				$choice.find( 'input' ).eq(0).prop('checked', true);
-				var $name = $cell.find('.rot-output').eq(0);
-				$name.text( rot );
+		// 		var rot = request.rotation;
+		// 		// Update radio button selection and cell text
+		// 		var $choice = $cell.find('.request-choice.' + rot ).eq(0);
+		// 		$choice.find( 'input' ).eq(0).prop('checked', true);
+		// 		var $name = $cell.find('.rot-output').eq(0);
+		// 		$name.text( rot );
 
-				$cell.find('input').prop('disabled', true);
+		// 		$cell.find('input').prop('disabled', true);
 
-				var $locker = $($cell.find('.locker')[0]);
-				$locker.removeClass('fa-unlock');
-				$locker.addClass('fa-lock');
-				$cell.addClass('locked');
-			}
-		}
+		// 		var $locker = $($cell.find('.locker')[0]);
+		// 		$locker.removeClass('fa-unlock');
+		// 		$locker.addClass('fa-lock');
+		// 		$cell.addClass('locked');
+		// 	}
+		// }
 
-		// EVENTS
-		// If it's the first time making this element,
-		// make user able to lock the month
-		if (!fromBuildCells) {
+		// // EVENTS
+		// // If it's the first time making this element,
+		// // make user able to lock the month
+		// if (!fromBuildCells) {
 
-			var $locker = $cell.find('.locker').eq(0);
-			$locker.click(function lockClicked( evnt ) {
-				toggleMonthLock( evnt, $locker, resident, month );
-			});  // lock and unlock month
+		// 	var $locker = $cell.find('.locker').eq(0);
+		// 	$locker.click(function lockClicked( evnt ) {
+		// 		toggleMonthLock( evnt, $locker, resident, month );
+		// 	});  // lock and unlock month
 
-			var $reqChoices = $cell.find('input[name=' + reqID + ']');
-			$reqChoices.click( function choiceClicked( evnt ) {
+		// 	var $reqChoices = $cell.find('input[name=' + reqID + ']');
+		// 	$reqChoices.click( function choiceClicked( evnt ) {
 
-				$cell.find('.rot-output').eq(0).text( $(this).val() );
-				toggleMonthLock( evnt, $locker, resident, month);
+		// 		$cell.find('.rot-output').eq(0).text( $(this).val() );
+		// 		toggleMonthLock( evnt, $locker, resident, month);
 
-			})
+		// 	})
 
-		}
+		// }
 
 		return $cell;
 	};  // End buildCell()
@@ -451,7 +451,8 @@ var Settings = function() {
 			$td.attr('data-month', month);
 			// console.log($td.prop('data-month'))  // still not working
 
-			// buildCell( $td, month, resident, true )
+			// ---- newly activated
+			buildCell( $td, month, resident, true )
 		}
 
 		return $tr;
@@ -520,7 +521,6 @@ var Settings = function() {
 				$trNode.attr('id', 'tr_' + id);
 
 				buildRowHeader( $trNode, resident );
-				// ---- newly activated
 				buildCells( $trNode, td, resident );
 				// Lock all if necessary
 				lockIf( $trNode, resident );
