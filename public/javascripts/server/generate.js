@@ -27,12 +27,12 @@ var convertMonth 	= require('../data/convert-one-month.js');
 'use strict';
 
 // var combosFile 	= fs.readFileSync('combos-test.json');
-var combosFile 	= fs.readFileSync(__dirname + '/../data/combos.json');
+var combosFile 	= fs.readFileSync(__dirname + '/../data/easy/combos.json');
 var combosArr 	= JSON.parse(combosFile);
 
 // Path to where combo data by vacation month is kept, in format for fs.readFile()
-var monthsDir 	= '../data/by-month';  // For local call
-// console.log('--------- directory:', fs.readdirSync('../../../../../../../../../Users/Comfadorable/Dropbox')); //+ '/../res-sched-app/'));// + '/../javascripts'));
+var monthsDir 	= __dirname + '/../data/easy/by-month';  // For local call
+// console.log('--------- directory:', fs.readdirSync(__dirname + '/../')); //+ '/../res-sched-app/'));// + '/../javascripts'));
 
 // var residents 	= [constraints.residents[0], constraints.residents[1]],
 // var residents 	= constraints.residents,
@@ -81,20 +81,25 @@ var bareMinimum = function ( tracker ) {
 };  // End bareMinimum()
 
 
-var wpVsruralConflicts = function( sched, resident ) {
+var wpVsRuralConflicts = function( sched, resident ) {
 // If the resident is a 'uh' resident, make sure
 // there's no consecutive Rural and Winter Park
-
-	var failed = false;
+	var failed 		= false;
 
 	// If they're uh, they can't have rural next to wp
 	if ( resident['dh_uh'] === 'uh' ) {
+
+		// Use the July to Jun calendar to check (that's their actual calendar)
+		var lastHalf 	= sched.slice(6),
+			firstHalf 	= sched.slice(0, 6),
+			julyStart 	= lastHalf.concat( firstHalf );
+
 		// schedule to string so we can check it more easily
-		var str = sched.join('');
-		// DEBUGGING
-		if (resi === 9) {
-			console.log('sched joined:', str);
-		}
+		var str = julyStart.join('');
+		// // DEBUGGING
+		// if (resi === 9) {
+		// 	console.log('sched joined:', str);
+		// }
 
 		// .match() returns null if nothing was found
 		var found1 = str.match(/25/),
@@ -102,10 +107,11 @@ var wpVsruralConflicts = function( sched, resident ) {
 		// If found1 or found2 found something, failed is true
 		// Force it to be a boolean
 		failed = !!found1 || !!found2;
-	}
+
+	}  // end if resident is 'uh'
 
 	return failed;
-};  // End wpVsruralConflicts()
+};  // End wpVsRuralConflicts()
 
 
 var tooMany = function ( resident, sched, tracker, num ) {
@@ -122,13 +128,11 @@ var tooMany = function ( resident, sched, tracker, num ) {
 		// Get the max allowed in this rotation in this month
 		var max = rotations[ rotationIndx ].perMonth[ monthi ].max;
 
-
 		// // Give more leniency to the last resident in hopes of finding a solution...
 		// // Allow another person to be put into one of the flexible rotations
 		// if ( resident.last && (rotationIndx === 2 || rotationIndx === 3 ) ) {
 		// 	max += 1;
 		// }
-
 
 		// If any of the rotationsn go over the limit, this schedule won't work
 		if ( tempAdd > max ) {
@@ -142,20 +146,20 @@ var tooMany = function ( resident, sched, tracker, num ) {
 			break;
 		}
 
-		// Comment out this to try to reduce number of requirements just to see if a solution can be found that way
-		// Make sure UH student isn't in both Cardio and Derm
-		// If the rotation index indicates this rotation is Cardio or Derm
-		if ( cardioDermLimit
-				&& uhConflicts.indexOf(rotationIndx) > -1
-				// and if resident is a UH resident
-				&& resident['dh_uh'] === 'uh'
-				// and if this month already has a resident in Cardio or Derm
-				&& tracker[9][monthi] >= 1 ) {
-			console.log('conflicting resident', resident.name, resident.dh_uh, tracker[9], monthi)
-			// This isn't a valid schedule
-			exceedsLimit = true;
-			break;
-		}  // end don't conflict uh resident in Cardio and Derm
+		// // Comment out this to try to reduce number of requirements just to see if a solution can be found that way
+		// // Make sure UH student isn't in both Cardio and Derm
+		// // If the rotation index indicates this rotation is Cardio or Derm
+		// if ( cardioDermLimit
+		// 		&& uhConflicts.indexOf(rotationIndx) > -1
+		// 		// and if resident is a UH resident
+		// 		&& resident['dh_uh'] === 'uh'
+		// 		// and if this month already has a resident in Cardio or Derm
+		// 		&& tracker[9][monthi] >= 1 ) {
+		// 	// console.log('conflicting resident', resident.name, resident.dh_uh, tracker[9], monthi)
+		// 	// This isn't a valid schedule
+		// 	exceedsLimit = true;
+		// 	break;
+		// }  // end don't conflict uh resident in Cardio and Derm
 
 	}  // end for every month
 
@@ -163,13 +167,11 @@ var tooMany = function ( resident, sched, tracker, num ) {
 };  // End tooMany()
 
 
-var meetsAllReqs = function( resident, sched, tracker) {
+var meetsAllReqs = function( resident, sched, tracker ) {
 // Tests out all the requirements
 
-	var meetsAllReqs 	= true;
-
 	var meetsMaxes 		= !tooMany( resident, sched, tracker ),
-		meetsUHConflict = !wpVsruralConflicts( sched, resident );
+		meetsUHConflict = !wpVsRuralConflicts( sched, resident );
 
 	// Both have to be true to return true
 	return meetsMaxes && meetsUHConflict;
@@ -198,15 +200,15 @@ var trackItUp = function ( resident, sched, tracker ) {
 // =============================================================
 // FOR DEBUGGING
 var elapsed = function( oldTime, newTime ) {
-	var newTime = newTime || Date.now()
-	var ms = newTime - oldTime;
+	var newTime = newTime || Date.now(),
+		ms 		= newTime - oldTime;
 	
-	var secs = ms/1000,
+	var secs 	= ms/1000,
 		min 	= secs/60,  min = Math.floor(min % 60),
 		hours 	= Math.floor(min / 60), secs = secs % 60;
 
-	// return hours + ':' + min + ':' + secs;// + ':' + ms/100 - secs;
-	return ms;
+	return hours + ':' + min + ':' + secs;// + ':' + ms/100 - secs;
+	// return ms;
 };  // End now()
 // =============================================================
 
@@ -232,15 +234,18 @@ var rankResult = function( resultArray ) {
 	return rank;
 };  // End rankResult()
 
+
 var tryingOne = 0;  // DEBUGGING
+var tryCount = 0;
 var tryOne = function( residents ) {
 // For meeting max requirements
 
+	// DEBUGGING
 	var reachedCount = { '7': 0, '8': 0, '9': 0 }
 
 	var thisTracker = JSON.parse(JSON.stringify( tracker ));  // global object `tracker`
 
-	var reached = 0;
+
 	for ( var resi = 0; resi < residents.length; resi++ ) {
 		reached = resi;
 
@@ -252,14 +257,15 @@ var tryOne = function( residents ) {
 			schedIndx 	= 0,
 			attemptNum 	= 1;
 
-var firstSchedIndx;
+		// DEBUGGING
+		var firstSchedIndx;
+
 		// http://stackoverflow.com/a/5915122/3791179
 		// Get random schedule
 		while ( searching ) {
-			if (stop) {
-				return null;
-			}
+			if ( stop ) { return null; }
 
+			// DEBUGGING
 			if ( resi > 6 ) { reachedCount[ resi + '' ] += 1 }
 
 			if ( !(resi === (residents.length - 1)) ) {
@@ -269,44 +275,38 @@ var firstSchedIndx;
 					// if ( resi > 6 ) {
 					// 	console.log('OVER 9000; reached resident', reachedCount);
 					// }
-					// console.log('OVER 9000; reached resident', reached);
-					// console.log('tryOne() Time elapsed:', elapsed( oldTime1 ) );
 					return null;
 				}
 
-				// Make sure we don't go over our limit of attempts
-				attemptNum += 1
 				// Get a random index for the resident's schedule
 				schedIndx = Math.floor(Math.random() * possible.length)
-			// for the last resident, go through all of them
+
+				// Make sure we don't go over our limit of attempts
+				// Will help if we're stuck on a combination that just doesn't work
+				attemptNum += 1
+
+			// for the last resident, go through all of them (took us long enough
+			// to get here. Might as we be thorough.)
 			} else {
 				reachedCount[ resi + '' ] += 1
+
 				// -1 because schedIndx gets increased after this check
 				if ( !(schedIndx < (possible.length - 1)) ) {
-					console.log('NONE FOUND FOR #10', reachedCount, firstSchedIndx );
+					// console.log('NONE FOUND FOR #10', reachedCount, firstSchedIndx );
 					// console.log( thisTracker )
 					// console.log('tryOne() Time elapsed:', elapsed( oldTime1 ) );
+					console.log( tryCount++ );  // , elapsed( oldTime ) );  // Just to know something is happening
 					return null;
 				}
 				schedIndx += 1;
 			}
  
+			// DEBUGGING
+			if ( attemptNum === 1 ) { firstSchedIndx = schedIndx; }
 
-
-			if ( attemptNum === 1 ) {
-				firstSchedIndx = schedIndx;
-			}
-
-
-			// Make sure we don't go over our limit of attempts
-			attemptNum += 1;
-			// // Get a random index for the resident's schedule
-			// schedIndx = Math.floor(Math.random() * possible.length)
-			// console.log('---------- more than possible? index:', schedIndx, ', possible:', (possible.length - 1) )
-			// var sched 		= possible[ resi ];
 			var sched 		= possible[ schedIndx ];
-			// To be meetsAllReq(...)
-			var meetsReqs 	= !tooMany( resident, sched, thisTracker, (possible.length - schedIndx) );
+			// var meetsReqs 	= !tooMany( resident, sched, thisTracker, (possible.length - schedIndx) );
+			var meetsReqs 	= meetsAllReqs( resident, sched, thisTracker );
 
 			// If there's a match
 			if ( meetsReqs ) {
@@ -395,18 +395,20 @@ var generateYears = function( residents, numWanted ) {
 var dhTransform = function( sched, resident ) {
 // Replace Rural with Elec in all DH residents
 
-	if ( resident.dh_uh === 'dh' ) {
+	var newSched = null;
 
+	if ( resident.dh_uh === 'dh' ) {
 		var index = sched.indexOf(2);
 
 		if (index !== -1) {  // Don't think we need this check, but meh
-		    sched[index] = 3;
+			newSched = sched.slice();
+		    newSched[index] = 3;
 		}
-
 	}
 
-	return sched;
+	return newSched || sched;
 };  // End dhTransform
+
 
 var mustExterminate = function( sched, unwanted ) {
 /*
@@ -586,6 +588,7 @@ var sortOptions = function( options ) {
 
 
 var unPossible = function( residents ) {
+// Make sure not to send back an unnecessary huge list
 
 	for (var resi = 0; resi < residents.length; resi++ ) {
 		residents[ resi ].possible = [];
@@ -630,22 +633,21 @@ var generate = function( resids, includeLimit ) {
 		// Try to figure it out and tell the person running the program
 		// TODO: Better - try to make sure this can't possibly happen by limiting input
 			// No rejections same as desired slots
-			// No vacations more than there are vacation months (actually, no more than 3 atm)
+			// No vacations more than there are vacation months (xxactually, no more than 3 atm)
+				// DONE: Added way to add more possible vacations. Max is not checked though.
 			// May want to add way to have additional vacation months
 		if (resident.possible.length <= 0 ) {
 			console.error('Hmm, no schedule for this resident?', resident.possible );
 		}
 	}  // end for every resident, assign possible schedules
 
+	var oneOption = generateYears( residents );
+	oneOption 	  = unPossible( oneOption );
 
-	var numWanted = numWanted || 10;  // Later will be option users can set
-
-	var oneOption = generateYears( residents, numWanted );
-	oneOption = unPossible( oneOption );
-
-	if ( oneOption === null ) {}
-	// var sorted 	= sortOptions( oneOption );  // Can't do this while testing with no metMins
+	if ( oneOption === null ) {};  // Is this in case of cancel?
+	// var sorted 	  = sortOptions( oneOption );  // Can't do this easily with no pre-ranked lists
 	// var simplified = simplify( oneOption );  // Move this to generating csv's
+	console.log( elapsed( oldTime ) );
 
 	// return sorted;
 	return oneOption;

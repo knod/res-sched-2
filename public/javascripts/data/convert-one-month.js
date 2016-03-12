@@ -21,7 +21,7 @@ var oneMontCSVtoJSON = function ( oldFilePath, newFilePath ) {
         if ( !isNaN(item) ) {
             schedIndexes.push( parseInt( allTextLines[ i ] ) );
         } else {
-            console.log('*********** one blank paragraph at the end ***********', item);
+            // console.log('*********** one blank paragraph at the end ***********', item);
         }
 
     }

@@ -22,7 +22,7 @@
 	<!-- <button name='cancel'>Cancel</button> -->
 
 	<!-- <div class='generating-area'> -->
-		<img class='loading ghost' src='/images/loading_icon.gif'></img>
+		<img class='loading ghost' src='images/loading_icon.gif'></img>
 	<!-- </div> -->
 
 	<table class='schedule'>
@@ -57,57 +57,16 @@
 		var starter = [
 			// MAX 3 VACATIONS IN `vacationMonths`!!! OTHERS CAN GO IN `extraVacationMonths`
 			// `rejects` is monts and rotations that the resident definitely doesn't want to do
-			// each working schedule should be kept with final results
-			{
-				name: 'Roxi', dh_uh: 'dh', locked: false,
-				vacationMonths: [], extraVacationMonths: [],
-				requested: [],
-				rejected: [],
-				possible: [],//, schedule: []
-				lockedMonths: [],
-				selected: []  // there will be repeats from requested
-			},
-			{
-				name: 'Sarah', dh_uh: 'dh', locked: false,
-				vacationMonths: [], extraVacationMonths: [],
-				requested: [],
-				rejected: [],
-				possible: [],//, schedule: []
-				lockedMonths: [],
-				selected: []  // there will be repeats from requested
-			},
-			{
-				name: 'Will', dh_uh: 'dh', locked: false,
-				vacationMonths: [/*"May", "Dec"*/], extraVacationMonths: [],
-				requested: [],
-				rejected: [],
-				possible: [],//, schedule: []
-				lockedMonths: [],
-				selected: []  // there will be repeats from requested
-			},
+			// each working schedule should be kept with final results,
 			{
 				name: 'Hayley', dh_uh: 'dh', locked: false,
 				vacationMonths: [], extraVacationMonths: [],
-				requested: [ {month: 'Jul', rotation: 'Elec'} ],
-				rejected: [],
-				possible: [],//, schedule: []
-				lockedMonths: [],
-				selected: []  // there will be repeats from requested
-			},
-			{
-				name: 'Beka', dh_uh: 'uh', locked: false,
-				vacationMonths: [], extraVacationMonths: [],
-				requested: [ {month: 'Aug', rotation: 'W-P'} ],
-				rejected: [],
-				possible: [],//, schedule: []
-				lockedMonths: [],
-				selected: []  // there will be repeats from requested
-			},
-			{
-				name: 'Ali', dh_uh: 'uh', locked: false,
-				vacationMonths: [], extraVacationMonths: [],
-				requested: [ {month: 'Jul', rotation: 'Elec'} ],
-				rejected: [],
+				requested: [
+					{month: 'Jan', rotation: 'W-P'},
+					{month: 'Jul', rotation: 'Elec'},
+					{month: 'Sep', rotation: 'Elec'}
+					],
+				rejected: [{month: 'Jun', rotations: ['FMS']}],
 				possible: [],//, schedule: []
 				lockedMonths: [],
 				selected: []  // there will be repeats from requested
@@ -116,7 +75,24 @@
 				name: 'Alex', dh_uh: 'uh', locked: false,
 				vacationMonths: [], extraVacationMonths: [],
 				requested: [],
-				rejected: [],
+				rejected: [
+					{month: 'Jan', rotations:['FMS']},
+					{month: 'Feb', rotations:['FMS']},
+					{month: 'Mar', rotations:['FMS']},
+					{month: 'Jul', rotations:['FMS', 'Rural']}
+				],
+				possible: [],//, schedule: []
+				lockedMonths: [],
+				selected: []  // there will be repeats from requested
+			},
+			{
+				name: 'Will', dh_uh: 'dh', locked: false,
+				vacationMonths: [], extraVacationMonths: [],
+				requested: [{month: 'Nov', rotation: 'Elec'}],
+				rejected: [
+					{month: 'May', rotations: ['FMS', 'Rural', 'W-P']},
+					{ month: 'Jun', rotations: ['FMS', 'Rural', 'W-P'] }
+				],
 				possible: [],//, schedule: []
 				lockedMonths: [],
 				selected: []  // there will be repeats from requested
@@ -124,8 +100,11 @@
 			{
 				name: 'Lisa', dh_uh: 'uh', locked: false,
 				vacationMonths: [], extraVacationMonths: [],
-				requested: [],
-				rejected: [],
+				requested: [{month: 'Nov', rotation:'Elec'}],
+				rejected: [
+					{month: 'May', rotations: ['Rural', 'FMS', 'W-P']},
+					{month: 'Jun', rotations: ['Rural', 'FMS', 'W-P']}
+				],
 				possible: [],//, schedule: []
 				lockedMonths: [],
 				selected: []  // there will be repeats from requested
@@ -133,7 +112,25 @@
 			{
 				name: 'Emily', dh_uh: 'uh', locked: false,
 				vacationMonths: [], extraVacationMonths: [],
-				requested: [],
+				requested: [{month: 'Oct', rotation: 'Elec'}, {month: 'Dec', rotation: 'Elec'}],
+				rejected: [],
+				possible: [],//, schedule: []
+				lockedMonths: [],
+				selected: []  // there will be repeats from requested
+			},
+			{
+				name: 'Sarah', dh_uh: 'dh', locked: false,
+				vacationMonths: ['May'], extraVacationMonths: [],
+				requested: [{month: 'Nov', rotation: 'Elec'}],
+				rejected: [],
+				possible: [],//, schedule: []
+				lockedMonths: [],
+				selected: []  // there will be repeats from requested
+			},
+			{
+				name: 'Beka', dh_uh: 'uh', locked: false,
+				vacationMonths: ['Jul'], extraVacationMonths: [],
+				requested: [ {month: 'Aug', rotation: 'W-P'} ],
 				rejected: [],
 				possible: [],//, schedule: []
 				lockedMonths: [],
@@ -141,12 +138,31 @@
 			},
 			{
 				name: 'Kelly', dh_uh: 'uh', locked: false,
-				vacationMonths: [], extraVacationMonths: [],
+				vacationMonths: ['Dec'], extraVacationMonths: [],
 				requested: [ {month: 'Aug', rotation: 'W-P'} ],
+				rejected: [ {month: 'Jul', rotations: ['FMS', 'Rural']} ],
+				possible: [],//, schedule: []
+				lockedMonths: [],
+				selected: []  // there will be repeats from requested
+			},
+			{
+				name: 'Ali', dh_uh: 'uh', locked: false,
+				vacationMonths: ['Oct', 'Sep'], extraVacationMonths: [],
+				requested: [ {month: 'Jul', rotation: 'Elec'} ],
 				rejected: [],
 				possible: [],//, schedule: []
 				lockedMonths: [],
 				selected: []  // there will be repeats from requested
+			},
+			{
+				name: 'Roxi', dh_uh: 'dh', locked: false,
+				vacationMonths: ['Sep'], extraVacationMonths: [],
+				requested: [],
+				rejected: [],
+				possible: [],//, schedule: []
+				lockedMonths: [],
+				selected: [],  // there will be repeats from requested
+				last: true
 			}
 		];
 
@@ -163,9 +179,9 @@
 		// convert data to csv and make available
 
 		// var settings = Settings();
-		var page 		= Page();
-		var tbody 	 	= $('.jade-views')[0];
-		page.load( tbody, starter );
+		// var page 		= Page();
+		// var tbody 	 	= $('.jade-views')[0];
+		// page.load( tbody, starter );
 
 		// var schedHandler = ScheduleHandler();
 		// schedHandler.generate( starter );

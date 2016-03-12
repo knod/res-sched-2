@@ -149,9 +149,11 @@ var rotations = [
 		vacation: false
 	},
 	{  // 2
+		// !!: If not finding solutions, switch this and winter park.
+		// TODO: Put rotations with the most constraints first.
 		name: 'Rural',  // Matches minus FMS
 		perMonth: [ {min: 0, max: numR - 4}, {min: 0, max: numR - 4}, {min: 0, max: numR - 4},
-			{min: 0, max: numR - 4}, {min: 0, max: numR - 3}, {min: 0, max: numR - 2},
+			{min: 0, max: numR - 4}, {min: 0, max: numR - 3}, {min: 0, max: 0},
 			{min: 0, max: numR - 4}, {min: 0, max: numR - 3}, {min: 0, max: numR - 3},
 			{min: 0, max: numR - 3}, {min: 0, max: numR - 3}, {min: 0, max: numR - 3}
 		],
@@ -262,13 +264,13 @@ var requirementTracker = [
 var maxes = [
 	[],  // Rotation numbers start with 1, so 0 is a placeholder
 	[4, 4, 4, 4, 3, 2, 4, 3, 3, 3, 3, 3],  // 1, FMS
-	[9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9],  // 2, Rural (actually 10)
-	[9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9],  // 3, Elective (actually 10)
+	[5, 5, 5, 5, 6, 0, 5, 6, 6, 6, 6, 6],  // 2, Rural (minus FMS, plus restrictions)
+	[5, 5, 5, 5, 6, 7, 5, 6, 6, 6, 6, 6],  // 3, Elective (minus FMS)
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],  // 4, Cardiology
 	[2, 1, 1, 1, 0, 0, 0, 2, 0, 0, 1, 2],  // 5, Winter Park
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],  // 6, Geriatrics
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],  // 7, PCMH
-	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],   // 8, Derm
+	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],  // 8, Derm
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]   // 9, UH in either Derm or Cardio
 ];
 
