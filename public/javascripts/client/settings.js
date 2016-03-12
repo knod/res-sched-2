@@ -338,7 +338,6 @@ var Settings = function() {
 			reqID 	= sanitzd + '_' + month + '_rot_request';
 		$cell.find('input[name=rot_request]').prop('name', reqID);
 
-		// ---- newly activated
 		// - GENTERATED -
 		var selected = resident.selected,
 			choice 	 = 'None';
@@ -372,46 +371,47 @@ var Settings = function() {
 			}  // end for every rotation in a rejection
 		}  // end for every rejection
 
-		// // - LOCKING -
-		// var lockedMonths = resident.lockedMonths,
-		// 	$input 		 = $cell.find('input'),
-		// 	$locker 	 = $cell.find('.locker').eq(0);
-		// if ( lockedMonths.indexOf(month) > -1 ) {
-		// 	$input.prop('disabled', true);
+		// ---- newly activated
+		// - LOCKING -
+		var lockedMonths = resident.lockedMonths,
+			$input 		 = $cell.find('input'),
+			$locker 	 = $cell.find('.locker').eq(0);
+		if ( lockedMonths.indexOf(month) > -1 ) {
+			$input.prop('disabled', true);
 
-		// 	$locker.removeClass('fa-unlock');
-		// 	$locker.addClass('fa-lock');
-		// 	$cell.addClass('locked');
-		// } else {
-		// 	$input.prop('disabled', false)
+			$locker.removeClass('fa-unlock');
+			$locker.addClass('fa-lock');
+			$cell.addClass('locked');
+		} else {
+			$input.prop('disabled', false)
 
-		// 	$locker.removeClass('fa-lock');
-		// 	$locker.addClass('fa-unlock');
-		// 	$cell.removeClass('locked');
-		// }
+			$locker.removeClass('fa-lock');
+			$locker.addClass('fa-unlock');
+			$cell.removeClass('locked');
+		}
 
-		// // Lock a month if it's requested
-		// var requested = resident.requested;
-		// for ( var reqi = 0; reqi < requested.length; reqi++ ) {
-		// 	var request = requested[ reqi ]
+		// Lock a month if it's requested
+		var requested = resident.requested;
+		for ( var reqi = 0; reqi < requested.length; reqi++ ) {
+			var request = requested[ reqi ]
 
-		// 	if ( request.month === month ) {
+			if ( request.month === month ) {
 
-		// 		var rot = request.rotation;
-		// 		// Update radio button selection and cell text
-		// 		var $choice = $cell.find('.request-choice.' + rot ).eq(0);
-		// 		$choice.find( 'input' ).eq(0).prop('checked', true);
-		// 		var $name = $cell.find('.rot-output').eq(0);
-		// 		$name.text( rot );
+				var rot = request.rotation;
+				// Update radio button selection and cell text
+				var $choice = $cell.find('.request-choice.' + rot ).eq(0);
+				$choice.find( 'input' ).eq(0).prop('checked', true);
+				var $name = $cell.find('.rot-output').eq(0);
+				$name.text( rot );
 
-		// 		$cell.find('input').prop('disabled', true);
+				$cell.find('input').prop('disabled', true);
 
-		// 		var $locker = $($cell.find('.locker')[0]);
-		// 		$locker.removeClass('fa-unlock');
-		// 		$locker.addClass('fa-lock');
-		// 		$cell.addClass('locked');
-		// 	}
-		// }
+				var $locker = $($cell.find('.locker')[0]);
+				$locker.removeClass('fa-unlock');
+				$locker.addClass('fa-lock');
+				$cell.addClass('locked');
+			}
+		}
 
 		// // EVENTS
 		// // If it's the first time making this element,
