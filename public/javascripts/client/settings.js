@@ -73,6 +73,7 @@ var Settings = function() {
 				res.vacationMonths.push( month );
 			// File structure doesn't support more. Have to do those with logic. Fewer to go through, though
 			} else {
+				console.log('extra vacations?')
 				res.extraVacationMonths.push( month );
 			}
 		}

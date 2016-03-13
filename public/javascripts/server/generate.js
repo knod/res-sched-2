@@ -170,11 +170,11 @@ var tooMany = function ( resident, sched, tracker, num ) {
 var meetsAllReqs = function( resident, sched, tracker ) {
 // Tests out all the requirements
 
-	var meetsMaxes 		= !tooMany( resident, sched, tracker ),
-		meetsUHConflict = !wpVsRuralConflicts( sched, resident );
+	var meetsMaxes 		= !tooMany( resident, sched, tracker );//,
+		//meetsUHConflict = !wpVsRuralConflicts( sched, resident );
 
 	// Both have to be true to return true
-	return meetsMaxes && meetsUHConflict;
+	return meetsMaxes;  // && meetsUHConflict;
 };  // End meetsAllReqs
 
 
@@ -305,6 +305,12 @@ var tryOne = function( residents ) {
 			if ( attemptNum === 1 ) { firstSchedIndx = schedIndx; }
 
 			var sched 		= possible[ schedIndx ];
+
+			// if ( resident.name === 'Kelly' ) {
+			// 	if ( sched[11] === 7 ) {
+			// 		console.log('pcmh in vacation slot.', sched );
+			// 	}
+			// }
 			// var meetsReqs 	= !tooMany( resident, sched, thisTracker, (possible.length - schedIndx) );
 			var meetsReqs 	= meetsAllReqs( resident, sched, thisTracker );
 
@@ -476,15 +482,15 @@ specifically not desired
 	for ( var schedi = 0; schedi < possible.length; schedi++ ) {
 
 		var sched = possible[ schedi ];
+		// Not sure it fits here, but don't want to loop through again
+		// Replace Rural with Elec in all DH residents
+		sched = dhTransform( sched, resident );
 
 		var hasDesired = upToSnuff( sched, booked );
 		if ( hasDesired ) {
 			// and doesn't contain slots the resident has rejected
 			var reject = mustExterminate( sched, unwanted );
 			if ( !reject ) {
-				// Not sure it fits here, but don't want to loop through again
-				// Replace Rural with Elec in all DH residents
-				sched = dhTransform( sched, resident );
 				// add it to the list of their possible schedules
 				actual.push( sched );
 			}
@@ -496,8 +502,10 @@ specifically not desired
 
 
 var addVacations = function( resident, possible ) {
+// NOT WORKING
 
 	var extras = resident.extraVacationMonths;
+	console.log( resident.name, extras );
 
 	// If there are no more to add, limits with, don't add any more
 	if ( extras.length <= 0 ) { return possible; }
@@ -550,7 +558,7 @@ var vacationLimitation = function( vacations ) {
 
 	// If there were no vacations requested, just return the big list
 	if ( filename === '' ) {
-		result = combosArr;
+		result = combosArr.slice();
 	} else {
 		// Get file with info ordered by vacation months
 		var indexes = convertMonth( monthsDir + '/' + filename + '.csv' );
@@ -559,7 +567,17 @@ var vacationLimitation = function( vacations ) {
 		// Get the actual combos
 		for ( var i = 0; i < indexes.length; i++ ) {
 			// brobot started schedule combo indexes at 1
-			result.push( combosArr[ indexes[i] - 1 ] );
+			var indx = indexes[i] - 1;
+			// DEBUGGING
+			if ( filename === '12' ) {
+				// if ( (combosArr[ (indx + 1) ] )[11] === 7 ) {
+				// 	console.log('pcmh in vacation slot. Using low. High:', (indx), combosArr[ indx], ', High:', (indx + 1), combosArr[ (indx + 1) ]);
+				// }
+				if ( (combosArr[ indx ] )[11] === 7 ) {
+					console.log('pcmh in vacation slot. Using low. Low:', (indx), combosArr[ indx], ', High:', (indx + 1), combosArr[ (indx + 1) ]);
+				}
+			}
+			result.push( combosArr[ indexes[i] - 1 ].slice() );
 		}
 	}  // end if any filename
 
@@ -648,6 +666,7 @@ var generate = function( resids, includeLimit ) {
 	// var sorted 	  = sortOptions( oneOption );  // Can't do this easily with no pre-ranked lists
 	// var simplified = simplify( oneOption );  // Move this to generating csv's
 	console.log( elapsed( oldTime ) );
+	var oneOption = residents;
 
 	// return sorted;
 	return oneOption;

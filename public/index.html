@@ -61,9 +61,73 @@
 			{
 				name: 'Hayley', dh_uh: 'dh', locked: false,
 				vacationMonths: [], extraVacationMonths: [],
-				requested: [{month: 'Nov', rotation: 'Elec'}],
-				rejected: [{month: 'Jun', rotations: ['FMS']}],
-				possible: [],//, schedule: []
+				requested: [
+					{month: 'Feb', rotation: 'W-P'},  // leave 1
+					{month: 'Jul', rotation: 'Elec'}  // 1
+					],
+				rejected: [
+					{month: 'Jun', rotations: ['FMS', 'Elec']},  // 7
+					{month: 'Sep', rotations: ['FMS']}  // 8
+				],
+				possible: [],
+				lockedMonths: [],
+				selected: []  // there will be repeats from requested
+			},
+			{
+				name: 'Emily', dh_uh: 'uh', locked: false,
+				vacationMonths: [], extraVacationMonths: [],
+				requested: [{month: 'Oct', rotation: 'Elec'},  // leaves 1
+							{month: 'Dec', rotation: 'Elec'}],  // leaves 1
+				rejected: [],
+				possible: [],
+				lockedMonths: [],
+				selected: []  // there will be repeats from requested
+			},
+			{
+				name: 'Ali', dh_uh: 'uh', locked: false,
+				vacationMonths: ['Sep'], extraVacationMonths: [],  // 7
+				requested: [ {month: 'Jul', rotation: 'Elec'} ],  // 1
+				rejected: [
+					{ month: 'Oct', rotations: ['FMS','Rural'] },  // 7
+					{ month: 'Jun', rotations: ['FMS'] },  // 8
+					{ month: 'Aug', rotations: ['Rural'] }  // 11
+					],
+				possible: [],
+				lockedMonths: [],
+				selected: []  // there will be repeats from requested
+			},
+			{
+				name: 'Kelly', dh_uh: 'uh', locked: false,
+				vacationMonths: ['Jun','Sep','Oct'], extraVacationMonths: [],  // 7*3
+				requested: [ {month: 'Aug', rotation: 'W-P'} ],  // 1
+				rejected: [{month: 'Dec', rotations: ['FMS']}],  // 8
+				possible: [],
+				lockedMonths: [],
+				selected: []  // there will be repeats from requested
+			},
+			{
+				name: 'Will', dh_uh: 'dh', locked: false,
+				vacationMonths: [], extraVacationMonths: [],
+				requested: [{month: 'Nov', rotation: 'Elec'}],  // leaves 1
+				rejected: [
+					{ month: 'May', rotations: ['FMS', 'Rural', 'W-P'] },  // leaves 6
+					{ month: 'Jun', rotations: ['FMS', 'Rural', 'W-P'] }  // 6
+				],
+				possible: [],
+				lockedMonths: [],
+				selected: []  // there will be repeats from requested
+			},
+			{
+				name: 'Lisa', dh_uh: 'uh', locked: false,
+				vacationMonths: [], extraVacationMonths: [],
+				requested: [{month: 'Nov', rotation: 'Elec'}],  // 1
+				rejected: [
+					{ month: 'May', rotations: ['FMS', 'Rural', 'W-P'] },  // leaves 6
+					{ month: 'Jun', rotations: ['FMS', 'Rural', 'W-P'] },  // 6
+					{ month: 'Oct', rotations: ['Rural'] },  // 11
+					{ month: 'Dec', rotations: ['Rural'] }  // 11
+				],
+				possible: [],
 				lockedMonths: [],
 				selected: []  // there will be repeats from requested
 			},
@@ -71,82 +135,39 @@
 				name: 'Alex', dh_uh: 'uh', locked: false,
 				vacationMonths: [], extraVacationMonths: [],
 				requested: [],
-				rejected: [],
-				possible: [],//, schedule: []
-				lockedMonths: [],
-				selected: []  // there will be repeats from requested
-			},
-			{
-				name: 'Will', dh_uh: 'dh', locked: false,
-				vacationMonths: [], extraVacationMonths: [],
-				requested: [],
 				rejected: [
+					{month: 'Jan', rotations:['FMS']},  // 8
+					{month: 'Mar', rotations:['FMS']},  // 8
+					{month: 'Jul', rotations:['FMS', 'Rural']} // 7
 				],
-				possible: [],//, schedule: []
-				lockedMonths: [],
-				selected: []  // there will be repeats from requested
-			},
-			{
-				name: 'Lisa', dh_uh: 'uh', locked: false,
-				vacationMonths: [], extraVacationMonths: [],
-				requested: [],
-				rejected: [
-				],
-				possible: [],//, schedule: []
-				lockedMonths: [],
-				selected: []  // there will be repeats from requested
-			},
-			{
-				name: 'Emily', dh_uh: 'uh', locked: false,
-				vacationMonths: [], extraVacationMonths: [],
-				requested: [],
-				rejected: [],
-				possible: [],//, schedule: []
+				possible: [],
 				lockedMonths: [],
 				selected: []  // there will be repeats from requested
 			},
 			{
 				name: 'Sarah', dh_uh: 'dh', locked: false,
-				vacationMonths: ['May'], extraVacationMonths: [],
-				requested: [],
+				vacationMonths: ['May'], extraVacationMonths: [],  // 7
+				requested: [{month: 'Jan', rotation: 'Elec'}],  //  1
 				rejected: [],
-				possible: [],//, schedule: []
+				possible: [],
 				lockedMonths: [],
 				selected: []  // there will be repeats from requested
 			},
 			{
 				name: 'Beka', dh_uh: 'uh', locked: false,
-				vacationMonths: ['Jul'], extraVacationMonths: [],
-				requested: [ {month: 'Aug', rotation: 'W-P'} ],
+				vacationMonths: ['Jul'], extraVacationMonths: [],  // 7
+				requested: [ {month: 'Aug', rotation: 'W-P'} ],   // 1
 				rejected: [],
-				possible: [],//, schedule: []
-				lockedMonths: [],
-				selected: []  // there will be repeats from requested
-			},
-			{
-				name: 'Kelly', dh_uh: 'uh', locked: false,
-				vacationMonths: ['Dec'], extraVacationMonths: [],
-				requested: [  ],
-				rejected: [ {month: 'Jul', rotations: ['FMS', 'Rural']} ],
-				possible: [],//, schedule: []
-				lockedMonths: [],
-				selected: []  // there will be repeats from requested
-			},
-			{
-				name: 'Ali', dh_uh: 'uh', locked: false,
-				vacationMonths: ['Oct', 'Sep'], extraVacationMonths: [],
-				requested: [ {month: 'Jul', rotation: 'Elec'} ],
-				rejected: [],
-				possible: [],//, schedule: []
+				possible: [],
 				lockedMonths: [],
 				selected: []  // there will be repeats from requested
 			},
 			{
 				name: 'Roxi', dh_uh: 'dh', locked: false,
-				vacationMonths: ['Sep'], extraVacationMonths: [],
+				vacationMonths: ['Sep'], extraVacationMonths: [],  // 7
 				requested: [],
 				rejected: [],
-				possible: [],//, schedule: []
+				possible: [],
 				lockedMonths: [],
 				selected: [],  // there will be repeats from requested
 				last: true
